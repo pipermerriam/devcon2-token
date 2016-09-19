@@ -38,7 +38,6 @@ contract Devcon2Token is TokenInterface {
     // owner => spender => ownedToken.id
     mapping (address => mapping (address => bytes32)) approvals;
 
-
     /*
      *  Read and write storage functions
      */
