@@ -4,6 +4,7 @@ import contextlib
 from gevent import socket
 from web3 import Web3
 from populus.utils.wait import Wait
+from populus.utils.filesystem import ensure_path_exists
 
 
 CONTEXT_SETTINGS = dict(
@@ -127,7 +128,7 @@ def issue(ctx, owner_address, identity):
     token_id_hex = web3.fromAscii(token_id)
     identity = token.call().identityOf(token_id)
 
-    click.echo(
+    token_details = (
         "\n"
         "Token Details:\n"
         "------------\n"
@@ -147,6 +148,12 @@ def issue(ctx, owner_address, identity):
             gasUsed=txn_receipt['gasUsed'],
         )
     )
+    click.echo(token_details)
+    ensure_path_exists('./token-logs')
+    log_file_path = './token-logs/{owner}.txt'.format(owner=owner_address)
+    with open(log_file_path, 'w') as log_file:
+        log_file.write(token_details)
+    click.echo("Wrote log to: {0}".format(log_file_path))
 
 
 DEVCON2_TOKEN = {
