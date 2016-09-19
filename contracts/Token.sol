@@ -18,7 +18,8 @@ contract Devcon2Token is TokenInterface {
     }
 
     function Devcon2Token() {
-        addMinter(msg.sender);
+        minters[msg.sender] = true;
+        MinterAdded(msg.sender);
     }
 
     /*
