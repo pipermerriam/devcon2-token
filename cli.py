@@ -34,8 +34,8 @@ def wait_for_ipc(ipc_path):
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.option('--ipc-path', default='/Users/piper/sites/devcon2-token/chains/local/geth.ipc')
-@click.option('--token-address', default='0x50fddb924c8fbe3820c8eb56e39c2d20a1b11626')
+@click.option('--ipc-path')
+@click.option('--token-address', default='0x0a43edfe106d295e7c1e591a4b04b5598af9474c')
 @click.pass_context
 def main(ctx, ipc_path, token_address):
     """
@@ -91,10 +91,22 @@ def validate_identity(ctx, value):
 
 
 @main.command()
+@click.pass_context
+def repl(ctx):
+    parent_ctx = ctx.parent
+
+    web3 = parent_ctx.web3
+    token = parent_ctx.token
+    wait = parent_ctx.wait
+
+    import pdb; pdb.set_trace()
+
+
+@main.command()
 @click.argument('owner_address', nargs=1)
 @click.argument('identity', nargs=1)
 @click.pass_context
-def mint(ctx, owner_address, identity):
+def issue(ctx, owner_address, identity):
     parent_ctx = ctx.parent
 
     validate_identity(parent_ctx, identity)
@@ -105,7 +117,7 @@ def mint(ctx, owner_address, identity):
     wait = parent_ctx.wait
 
     txn_hash = token.transact().mint(owner_address, identity)
-    click.echo("Minted new token: {0}".format(txn_hash))
+    click.echo("Minted new token via txn: {0}".format(txn_hash))
     click.echo("Waiting for txn to be mined ...", nl=False)
     txn_receipt = wait.for_receipt(txn_hash)
     txn = web3.eth.getTransaction(txn_hash)
@@ -121,8 +133,8 @@ def mint(ctx, owner_address, identity):
         "------------\n"
         "owner: {owner}\n"
         "identity: {identity}\n"
-        "token_id: {token_id_hex\n"
-        "txn: {txn_hash}\n"
+        "token_id: {token_id_hex}\n"
+        "minted in txn: {txn_hash}\n"
         "blockNumber: {blockNumber}\n"
         "gas: {gasUsed} / {gas}\n"
         "\n".format(
