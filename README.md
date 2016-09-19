@@ -41,7 +41,7 @@ person.
 
 Locations and Times:
 * Tuesday:
-    * Before conference somewhere in the lobby.
+    * Before conference somewhere in the lobby starting around 7:30am.
 
 
 # Source Code Verification
