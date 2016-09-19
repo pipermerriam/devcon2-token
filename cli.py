@@ -43,7 +43,7 @@ def main(ctx, ipc_path, token_address):
     Main command
     """
     web3 = Web3(Web3.IPCProvider(ipc_path=ipc_path))
-    wait = Wait(web3)
+    wait = Wait(web3, timeout=600)
     token = web3.eth.contract(
         address=token_address,
         abi=DEVCON2_TOKEN['abi'],
