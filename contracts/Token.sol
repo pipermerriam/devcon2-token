@@ -68,6 +68,8 @@ contract Devcon2Token is TokenInterface {
 
         // log the minting of this token.
         Mint(_to, id);
+        Transfer(0x0, _to, uint(_id));
+        TokenLib.logTransfer(0x0, _to, _id);
 
         // increase the supply.
         numTokens += 1;

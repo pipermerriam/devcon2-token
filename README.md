@@ -39,7 +39,9 @@ Send a text message to `+1 409 291-8432` or email to
 I will be setting up a table where you can come by and get your token in
 person.
 
-Locations and Times TDB
+Locations and Times:
+* Tuesday:
+    * Before conference somewhere in the lobby.
 
 
 # Source Code Verification
