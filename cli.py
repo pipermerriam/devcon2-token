@@ -71,7 +71,7 @@ def validate_owner_address(ctx, value):
         identity = token.call().identityOf(token_id)
         raise click.BadParameter('Already Token Holder: Identity - {0}'.format(identity))
     else:
-        return value
+        return value.lower()
 
 
 def validate_identity(ctx, value):
@@ -138,7 +138,7 @@ def issue(ctx, owner_address, identity):
         "minted in txn: {txn_hash}\n"
         "blockNumber: {blockNumber}\n"
         "gas: {gasUsed} / {gas}\n"
-        "\n".format(
+        "".format(
             owner=owner_address,
             identity=identity,
             token_id_hex=token_id_hex,
