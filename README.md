@@ -9,9 +9,9 @@ compliant contract.
 * Each token is associated with a string value, referred to as the identity.  This
   value is immutable.
 
-The contract is permissioned to allow minting of tokens only through midnight
-on Wednesday UTC.  After this period no new tokens will ever be mintable and
-the total supply will be forever fixed.
+The contract is permissioned to allow minting of tokens only through 8AM
+on Thursday morning, Shanghai time.  After this period no new tokens will ever
+be mintable and the total supply will be forever fixed.
 
 # Why
 
