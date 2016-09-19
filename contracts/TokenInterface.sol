@@ -6,9 +6,11 @@ contract TokenInterface {
     event Destroy(bytes32 _id);
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+    event MinterAdded(address who);
+    event MinterRemoved(address who);
 
     /*
-     *  Read and write storage functions
+     *  Minting
      */
     /// @dev Mints a new token.
     /// @param _to Address of token owner.
@@ -18,6 +20,18 @@ contract TokenInterface {
     /// @dev Destroy a token
     /// @param _id Bytes32 id of the token to destroy.
     function destroy(bytes32 _id) returns (bool success);
+
+    /// @dev Add a new minter
+    /// @param who Address the address that can now mint tokens.
+    function addMinter(address who) returns (bool);
+
+    /// @dev Remove a minter
+    /// @param who Address the address that will no longer be a minter.
+    function removeMinter(address who) returns (bool);
+
+    /*
+     *  Read and write storage functions
+     */
 
     /// @dev Return the number of tokens
     function totalSupply() returns (uint supply);

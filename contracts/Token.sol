@@ -81,6 +81,9 @@ contract Devcon2Token is TokenInterface {
         // only mintable till end of conference
         if (now >= _END_MINTING) throw;
 
+        // ensure the msg.sender is allowed to mint.
+        if (!minters[msg.sender]) return false;
+
         // pull the token to destroy
         var tokenToDestroy = tokens[_id];
 
@@ -97,6 +100,37 @@ contract Devcon2Token is TokenInterface {
         // decrease the supply.
         numTokens -= 1;
         
+        return true;
+    }
+
+    /// @dev Add a new minter
+    /// @param who Address the address that can now mint tokens.
+    function addMinter(address who) returns (bool) {
+        // only mintable till end of conference
+        if (now >= _END_MINTING) throw;
+
+        // ensure the msg.sender is allowed
+        if (!minters[msg.sender]) return false;
+
+        minters[who] = true;
+
+        // Log it
+        MinterAdded(who);
+
+        return true;
+    }
+
+    /// @dev Remove a minter
+    /// @param who Address the address that will no longer be a minter.
+    function removeMinter(address who) returns (bool) {
+        // ensure the msg.sender is allowed
+        if (!minters[msg.sender]) return false;
+
+        minters[who] = true;
+
+        // Log it
+        MinterRemoved(who);
+
         return true;
     }
 
