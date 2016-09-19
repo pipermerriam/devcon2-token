@@ -40,3 +40,29 @@ def test_cannot_destroy_after_window(chain,
     assert token.call().ownerOf(token_id) == token_owner
     assert token.call().isTokenOwner(token_owner) is True
     assert token.call().ownedToken(token_owner) == token_id
+
+
+def test_cannot_destroy_if_not_minter(chain,
+                                      web3,
+                                      token,
+                                      token_id,
+                                      token_owner,
+                                      get_destroy_data,
+                                      set_timestamp):
+    # fastforward to the end of the window
+    set_timestamp(token.call().END_MINTING())
+
+    assert token.call().identityOf(token_id) == 'Piper Merriam'
+    assert token.call().ownerOf(token_id) == token_owner
+    assert token.call().isTokenOwner(token_owner) is True
+    assert token.call().ownedToken(token_owner) == token_id
+
+    assert token.call().minters(web3.eth.accounts[1]) is False
+
+    with pytest.raises(ValueError):
+        token.transact({'from': web3.eth.accounts[1]}).destroy(token_id)
+
+    assert token.call().identityOf(token_id) == 'Piper Merriam'
+    assert token.call().ownerOf(token_id) == token_owner
+    assert token.call().isTokenOwner(token_owner) is True
+    assert token.call().ownedToken(token_owner) == token_id

@@ -1,11 +1,8 @@
-import sys
-
 import click
 
 import contextlib
 from gevent import socket
 from web3 import Web3
-from populus import Project
 from populus.utils.wait import Wait
 
 

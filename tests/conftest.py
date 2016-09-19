@@ -65,6 +65,16 @@ def get_destroy_data(get_event_data, token):
 
 
 @pytest.fixture()
+def get_minter_added_data(get_event_data, token):
+    return functools.partial(get_event_data, 'MinterAdded', token)
+
+
+@pytest.fixture()
+def get_minter_removed_data(get_event_data, token):
+    return functools.partial(get_event_data, 'MinterRemoved', token)
+
+
+@pytest.fixture()
 def get_transfer_data(get_event_data, TokenLib):
     return functools.partial(get_event_data, 'Transfer', TokenLib)
 

@@ -126,7 +126,7 @@ contract Devcon2Token is TokenInterface {
         // ensure the msg.sender is allowed
         if (!minters[msg.sender]) return false;
 
-        minters[who] = true;
+        minters[who] = false;
 
         // Log it
         MinterRemoved(who);
