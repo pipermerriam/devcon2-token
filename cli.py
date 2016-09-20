@@ -64,14 +64,17 @@ def validate_owner_address(ctx, value):
     token = ctx.token
     web3 = ctx.web3
 
+    if web3.Iban.isValid(value):
+        value = web3.Iban(value).address()
+
     if not web3.isAddress(value):
         raise click.BadParameter('Invalid Address: {0}'.format(value))
     elif token.call().isTokenOwner(value):
         token_id = token.call().ownedToken(value)
         identity = token.call().identityOf(token_id)
         raise click.BadParameter('Already Token Holder: Identity - {0}'.format(identity))
-    else:
-        return value.lower()
+
+    return value.lower()
 
 
 def validate_identity(ctx, value):
@@ -111,7 +114,7 @@ def issue(ctx, owner_address, identity):
     parent_ctx = ctx.parent
 
     validate_identity(parent_ctx, identity)
-    validate_owner_address(parent_ctx, owner_address)
+    owner_address = validate_owner_address(parent_ctx, owner_address)
 
     web3 = parent_ctx.web3
     token = parent_ctx.token
