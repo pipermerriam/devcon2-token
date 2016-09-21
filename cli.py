@@ -1,4 +1,5 @@
 import click
+import itertools
 
 import contextlib
 from gevent import socket
@@ -104,6 +105,68 @@ def repl(ctx):
     wait = parent_ctx.wait
 
     import pdb; pdb.set_trace()
+
+
+@main.command()
+@click.argument('addr', nargs=1)
+@click.pass_context
+def lookup(ctx, addr):
+    parent_ctx = ctx.parent
+    token = parent_ctx.token
+    identity = token.call().identityOf(token.call().ownedToken(addr))
+    click.echo("Identity: {0}".format(identity))
+
+
+@main.command()
+@click.pass_context
+def report(ctx):
+    parent_ctx = ctx.parent
+    token = parent_ctx.token
+    web3 = parent_ctx.web3
+
+    mint_filter = token.pastEvents('Mint', {
+        'address': '0x0a43edfe106d295e7c1e591a4b04b5598af9474c',
+        'fromBlock': 2100000,
+    })
+    destroy_filter = token.pastEvents('Destroy', {
+        'address': '0x0a43edfe106d295e7c1e591a4b04b5598af9474c',
+        'fromBlock': 2100000,
+    })
+
+    destroy_log_entries = destroy_filter.get(False)
+    destroyed_tokens = {
+        entry['args']['_id']
+        for entry in destroy_log_entries
+    }
+    mint_log_entries = mint_filter.get(False)
+    minted_tokens = [
+        (entry['args']['_to'], web3.fromAscii(entry['args']['_id']))
+        for entry in mint_log_entries
+        if entry['args']['_id'] not in destroyed_tokens
+    ]
+
+    all_transaction_hashes = list(itertools.chain(
+        [entry['transactionHash'] for entry in mint_log_entries],
+        [entry['transactionHash'] for entry in destroy_log_entries],
+    ))
+    all_transactions = [
+        (web3.eth.getTransaction(txn_hash), web3.eth.getTransactionReceipt(txn_hash))
+        for txn_hash in all_transaction_hashes
+    ]
+    total_gas_cost = sum((
+        txn_receipt['gasUsed'] * txn['gasPrice']
+        for txn, txn_receipt
+        in all_transactions
+    ))
+    total_gas_cost_in_ether = web3.fromWei(total_gas_cost, 'ether')
+
+    for owner_address, token_id in minted_tokens:
+        identity = token.call().identityOf(web3.toAscii(token_id))
+        click.echo("{addr} - {identity}".format(addr=owner_address, identity=identity))
+
+    click.echo("Total Gas Costs: {0}".format(total_gas_cost_in_ether))
+    click.echo("Addresses Registered: {0}".format(len(minted_tokens)))
+    click.echo("Number of Transactions: {0}".format(len(all_transaction_hashes)))
 
 
 @main.command()
