@@ -89,3 +89,19 @@ contract MainnetSurvey is Survey {
     function MainnetSurvey(uint duration, string _question, bytes32[] _responseOptions) Survey(0xabf65a51c7adc3bdef0adf8992884be38072c184, duration, _question, _responseOptions) {
     }
 }
+
+
+contract ETCSurvey is MainnetSurvey {
+    function ETCSurvey() MainnetSurvey(
+            2 weeks,
+            "Do plan to pursue any development or involvement on the Ethereum Classic blockchain",
+            _options
+        )
+    {
+        bytes32[] memory _options = new bytes32[](4);
+        _options[0] = "No Answer";
+        _options[1] = "Yes";
+        _options[2] = "No";
+        _options[3] = "Undecided";
+    }
+}
