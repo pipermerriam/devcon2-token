@@ -5,6 +5,15 @@ def pad_to_bytes32(v):
     return v + '\x00' * (32 - len(v))
 
 
+def test_etc_constructor(chain, token):
+    etc_survey = chain.get_contract('ETCSurvey', deploy_args=(token.address,))
+    assert etc_survey.call().numResponseOptions() == 4
+    assert etc_survey.call().responseOptions(0) == pad_to_bytes32("No Answer")
+    assert etc_survey.call().responseOptions(1) == pad_to_bytes32("Yes")
+    assert etc_survey.call().responseOptions(2) == pad_to_bytes32("No")
+    assert etc_survey.call().responseOptions(3) == pad_to_bytes32("Undecided")
+
+
 def test_survey_data_accessors(survey):
     assert survey.call().question() == 'What is your favorite color?'
     assert survey.call().numResponseOptions() == 8

@@ -91,15 +91,23 @@ contract MainnetSurvey is Survey {
 }
 
 
-contract ETCSurvey is MainnetSurvey {
-    function ETCSurvey(address tokenAddress, string _question, bytes32[] _responseOptions) {
-        devcon2Token = Devcon2Interface(0xabf65a51c7adc3bdef0adf8992884be38072c184);
-        question = "Do plan to pursue any development or involvement on the Ethereum Classic blockchain";
+contract ETCSurvey is Survey {
+    function ETCSurvey(address tokenAddress) Survey(
+        tokenAddress,
+        2 weeks,
+        "Do you plan to pursue any development efforts or involvement with the Ethereum Classic blockchain",
+        new bytes32[](0)
+    ) {
         numResponseOptions = 4;
         responseOptions.push("No Answer");
         responseOptions.push("Yes");
         responseOptions.push("No");
         responseOptions.push("Undecided");
-        surveyEndAt = now + 2 weeks;
+    }
+}
+
+
+contract MainnetETCSurvey is ETCSurvey {
+    function MainnetETCSurvey() ETCSurvey(0xabf65a51c7adc3bdef0adf8992884be38072c184) {
     }
 }
