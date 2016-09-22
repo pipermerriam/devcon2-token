@@ -21,27 +21,10 @@ It's an experiment to see what people do with it and what people build with it.
 
 # How to get your token.
 
-## Text Message or Email
+The contract includes a hard cut-off for token minting that closed at 8AM on
+September 22nd, 2016 Shanghai time.
 
-Send a text message to `+1 409 291-8432` or email to
-[`pipermerriam@gmail.com`](mailto:pipermerriam@gmail.com) with the following.
-
-1. Selfie that includes your face and your devcon badge with your name visible.
-2. Your ethereum address.
-3. The name or identifier that you would like registered with your contract.
-    * If you don't include this I will use your name from your devcon badge.
-    * This value will be forever immutable.
-    * Please keep this short.
-
-
-## In Person
-
-I will be setting up a table where you can come by and get your token in
-person.
-
-Locations and Times:
-* Tuesday:
-    * Before conference somewhere in the lobby starting around 7:30am.
+Tokens were issued at the Devcon2 conference in Shanghai.
 
 
 # Source Code Verification
