@@ -68,8 +68,8 @@ contract Devcon2Token is TokenInterface {
 
         // log the minting of this token.
         Mint(_to, id);
-        Transfer(0x0, _to, uint(_id));
-        TokenLib.logTransfer(0x0, _to, _id);
+        Transfer(0x0, _to, uint(id));
+        TokenLib.logTransfer(0x0, _to, id);
 
         // increase the supply.
         numTokens += 1;
@@ -283,5 +283,14 @@ contract Devcon2Token is TokenInterface {
     /// @param _id Bytes32 id of token to lookup.
     function ownerOf(bytes32 _id) constant returns (address owner) {
         return tokens[_id].owner;
+    }
+}
+
+
+contract Devcon2TokenForTesting is Devcon2Token {
+    uint public END_MINTING;
+
+    function Devcon2TokenForTesting() Devcon2Token() {
+        END_MINTING = now + 1 weeks;
     }
 }

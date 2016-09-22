@@ -20,7 +20,7 @@ from testrpc import testrpc
 
 @pytest.fixture()
 def token(chain, web3):
-    token = chain.get_contract('Devcon2Token')
+    token = chain.get_contract('Devcon2TokenForTesting')
     chain_code = web3.eth.getCode(token.address)
     assert len(chain_code) > 10
     assert token.call().minters(web3.eth.coinbase) is True
@@ -36,52 +36,6 @@ def token_lib(chain):
 @pytest.fixture()
 def TokenLib(token_lib):
     return type(token_lib)
-
-
-@pytest.fixture()
-def get_event_data(chain, web3):
-    def _get_event_data(event_name, contract, txn_hash):
-        txn_receipt = chain.wait.for_receipt(txn_hash)
-        filter = contract.pastEvents(event_name, {
-            'fromBlock': txn_receipt['blockNumber'],
-            'toBlock': txn_receipt['blockNumber'],
-        })
-        log_entries = filter.get()
-        if len(log_entries) == 0:
-            raise AssertionError("Something went wrong.  No '{0}' log entries found".format(event_name))
-        event_data = log_entries[0]
-        return event_data
-    return _get_event_data
-
-
-@pytest.fixture()
-def get_mint_data(get_event_data, token):
-    return functools.partial(get_event_data, 'Mint', token)
-
-
-@pytest.fixture()
-def get_destroy_data(get_event_data, token):
-    return functools.partial(get_event_data, 'Destroy', token)
-
-
-@pytest.fixture()
-def get_minter_added_data(get_event_data, token):
-    return functools.partial(get_event_data, 'MinterAdded', token)
-
-
-@pytest.fixture()
-def get_minter_removed_data(get_event_data, token):
-    return functools.partial(get_event_data, 'MinterRemoved', token)
-
-
-@pytest.fixture()
-def get_transfer_data(get_event_data, TokenLib):
-    return functools.partial(get_event_data, 'Transfer', TokenLib)
-
-
-@pytest.fixture()
-def get_approval_data(get_event_data, TokenLib):
-    return functools.partial(get_event_data, 'Approval', TokenLib)
 
 
 @pytest.fixture()
@@ -144,8 +98,73 @@ def unknown_token_id(token, web3):
 
 
 @pytest.fixture()
+def survey(chain, web3, token, token_owner, other_token_owner):
+    survey = chain.get_contract('Survey', deploy_args=(
+        token.address,
+        60 * 60 * 24 * 7,  # 1 week
+        'What is your favorite color?',
+        ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Rainbow'],
+    ))
+
+    chain_bytecode = web3.eth.getCode(survey.address)
+    assert len(chain_bytecode) >= 10
+    return survey
+
+
+@pytest.fixture()
 def NULL_TOKEN():
     return '\x00' * 32
+
+
+@pytest.fixture()
+def get_event_data(chain, web3):
+    def _get_event_data(event_name, contract, txn_hash):
+        txn_receipt = chain.wait.for_receipt(txn_hash)
+        filter = contract.pastEvents(event_name, {
+            'fromBlock': txn_receipt['blockNumber'],
+            'toBlock': txn_receipt['blockNumber'],
+        })
+        log_entries = filter.get()
+        if len(log_entries) == 0:
+            raise AssertionError("Something went wrong.  No '{0}' log entries found".format(event_name))
+        event_data = log_entries[0]
+        return event_data
+    return _get_event_data
+
+
+@pytest.fixture()
+def get_mint_data(get_event_data, token):
+    return functools.partial(get_event_data, 'Mint', token)
+
+
+@pytest.fixture()
+def get_destroy_data(get_event_data, token):
+    return functools.partial(get_event_data, 'Destroy', token)
+
+
+@pytest.fixture()
+def get_minter_added_data(get_event_data, token):
+    return functools.partial(get_event_data, 'MinterAdded', token)
+
+
+@pytest.fixture()
+def get_minter_removed_data(get_event_data, token):
+    return functools.partial(get_event_data, 'MinterRemoved', token)
+
+
+@pytest.fixture()
+def get_transfer_data(get_event_data, TokenLib):
+    return functools.partial(get_event_data, 'Transfer', TokenLib)
+
+
+@pytest.fixture()
+def get_approval_data(get_event_data, TokenLib):
+    return functools.partial(get_event_data, 'Approval', TokenLib)
+
+
+@pytest.fixture()
+def get_response_data(get_event_data, survey):
+    return functools.partial(get_event_data, 'Response', survey)
 
 
 @pytest.fixture()

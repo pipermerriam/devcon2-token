@@ -74,3 +74,171 @@ the tokens.
 * `function isTokenOwner(address _owner) constant returns (bool)`
 * `function identityOf(bytes32 _id) constant returns (string identity)`
 * `function ownerOf(bytes32 _id) constant returns (address owner)`
+
+
+# Examples
+
+Examples of how you can build on top of this contract.
+
+> These examples are *not* intended to be an introduction to Solidity.  If you would like to learn more about the Solidity programming language I recommend heading over to the [Solidity Documentation](http://solidity.readthedocs.org/)
+
+## Survey
+
+In this example we will build a contract designed to survey the token holders.
+
+* The contract represents a single question we wish to ask the Devcon2 Token
+  holders.
+* The survey remains open for responses for a fixed duration of time.
+* Each token holder may respond exactly once to the survey.
+* Each question has a fixed number of response options.
+
+First we need an interface contract.  For these examples we'll use the
+following barebones one, but you should take a look at the
+[`TokenInterface.sol'](./contracts/TokenInterface.sol) contract in the
+`./contracts/` directory of this repository for a more complete interface.
+
+
+```javascript
+contract Devcon2Interface {
+    function isTokenOwner(address _owner) constant returns (bool);
+    function ownedToken(address _owner) constant returns (bytes32 tokenId);
+}
+```
+
+Now lets look at our full Survey contract.
+
+
+```javascript
+contract Survey {
+    Devcon2Interface constant devcon2Token = Devcon2Interface(0xabf65a51c7adc3bdef0adf8992884be38072c184);
+
+    // Mapping from tokenId to boolean noting whether this token has responded.
+    mapping (bytes32 => bool) public hasResponded;
+    
+    // The timestamp when this survey will end.
+    uint public surveyEndAt;
+
+    // The question we wish to ask the token holders.
+    string public question;
+
+    // An array of answer options.
+    bytes32[] public responseOptions;
+
+    // Helper for accessing the number of options programatically.
+    uint public numResponseOptions;
+
+    // Histogram of the responses as a mapping from option index to number of
+    // responses for that option.
+    mapping (uint => uint) public responseCounts;
+
+    // Total number of responses.
+    uint public numResponses;
+
+    // Event for logging response submissions.
+    event Response(bytes32 indexed tokenId, uint responseId);
+
+    /// @dev Sets up the survey contract
+    /// @param tokenAddress Address of Devcon2 Identity Token contract.
+    /// @param duration Integer duration the survey should remain open and accept answers.
+    /// @param _question String the survey question.
+    /// @param _responseOptions Array of Bytes32 allowed survey response options.
+    function Survey(uint duration, string _question, bytes32[] _responseOptions) {
+        question = _question;
+        numResponseOptions = _responseOptions.length;
+        for (uint i=0; i < numResponseOptions; i++) {
+            responseOptions.push(_responseOptions[i]);
+        }
+        surveyEndAt = now + duration;
+    }
+
+    /// @dev Respond to the survey
+    /// @param responseId Integer index of the response option being submitted.
+    function respond(uint responseId) returns (bool) {
+        // Check our survey hasn't ended.
+        if (now >= surveyEndAt) return false;
+
+        // Only allow token holders
+        if (!devcon2Token.isTokenOwner(msg.sender)) return false;
+
+        // Each token has a unique bytes32 identifier.  Since tokens are
+        // transferable, we want to use this value instead of the owner address
+        // for preventing the same owner from responding multiple times.
+        var tokenId = devcon2Token.ownedToken(msg.sender);
+
+        // Sanity check.  The 0x0 token is invalid which means something went
+        // wrong.
+        if (tokenId == 0x0) throw;
+
+        // verify that this token has not yet responded.
+        if (hasResponded[tokenId]) return false;
+
+        // verify the response is valid
+        if (responseId >= responseOptions.length) return false;
+
+        responseCounts[responseId] += 1;
+
+        // log the response.
+        Response(tokenId, responseId);
+
+        // Mark this token as having responded to the question.
+        hasResponded[tokenId] = true;
+
+        // increment the response counter
+        numResponses += 1;
+    }
+}
+```
+
+The *important* parts are the following portions of the `respond(...)` function.
+
+```javascript
+    function respond(uint responseId) returns (bool) {
+        ...
+        // Only allow token holders
+        if (!devcon2Token.isTokenOwner(msg.sender)) return false;
+
+        // Each token has a unique bytes32 identifier.  Since tokens are
+        // transferable, we want to use this value instead of the owner address
+        // for preventing the same owner from responding multiple times.
+        var tokenId = devcon2Token.ownedToken(msg.sender);
+
+        // Sanity check.  The 0x0 token is invalid which means something went
+        // wrong.
+        if (tokenId == 0x0) throw;
+
+        // verify that this token has not yet responded.
+        if (hasResponded[tokenId]) return false;
+
+        ...
+
+        // Mark this token as having responded to the question.
+        hasResponded[tokenId] = true;
+
+        ...
+    }
+```
+
+When you want to restrict access based on Devcon2 tokens you will want to do so
+based on the `TokenId` rather than the address that owns the token.  The reason
+for this is that Devcon2 tokens are transferable, and thus, if you restrict
+based on address, a token owner could then transfer the token to a new address
+and respond a second time.
+
+In the lines above the following things occur.
+
+1. Check whether the current address is a token owner.
+2. Retrieve the `tokenId` for the token that address owns.
+3. Check that the `tokenId` is not somehow `0x0`.
+4. Check that a response has not yet been recorded for this `tokenId`.
+4. Record a response for the `tokenId`.
+
+> If you are paying really close attention you may notice that step 2 and 3 are effectively duplicates of step 1.  This my personal style for Solidity development.  I prefer readability over optimization and believe that it produces safer contracts with fewer bugs.
+
+You can query whether a given address is a token holder using the
+`isTokenOwner(address _owner)` function which returns `true` or `false`
+indicating whether the address owns a Devcon2 Identity token.
+
+You can retrieve the token id for a given address using the
+``ownedToken(address _owner)`` function.  It is important to be sure that the
+returned value is not `0x0` which will be the case if `_owner` is not a token
+holder.
