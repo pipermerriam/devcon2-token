@@ -16,7 +16,7 @@ be mintable and the total supply will be forever fixed.
 
 # Why
 
-It's an experiment to see what people do with it.
+It's an experiment to see what people do with it and what people build with it.
 
 
 # How to get your token.
