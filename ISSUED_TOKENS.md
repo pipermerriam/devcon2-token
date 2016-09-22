@@ -218,3 +218,11 @@
 0xa053587c5686325ca0b0dfc5457ce52afbfd657c - Girl from ShapeShift who I believe is named kim but she walked away before telling me what name to register
 0x2df4fcf2bcc07c510ffae9b4071db0486e08e831 - Alex
 0xb86d609c189144e61f27560edd7800c98ac2907e - ATSUSHI OGISAWA
+0xe89ca7ef83dd2d55bc70b8ae39458af9d5834743 - vinny
+0x280dcb84bb08381968fe62af5ec5ba15d5bb834b - Flora
+0xdbf03b407c01e7cd3cbea99509d93f8dddc8c6fb - ???
+0x22dc622df269e140a85ab8268b49f82f84713558 - Jeff Lau
+0x1b5c6e1e7981a186fc54bfa343bab295027ac351 - Simon Janin
+0x471f3522eaac53133bca7c5c766e1a06a4414f26 - Enrico
+0xbf88973142429d17f1386fc7bacd7395d62934c1 - hiddentao
+0x82dab27ef586c98f6ba6ad4f23ba4d7bb18986d1 - Hendrik Tan
