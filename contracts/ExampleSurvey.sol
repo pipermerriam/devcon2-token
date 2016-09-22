@@ -86,7 +86,7 @@ contract Survey {
 
 
 contract MainnetSurvey is Survey {
-    function MainnetSurvey(uint duration, string _question, bytes32[] _responseOptions) Survey(0xabf65a51c7adc3bdef0adf8992884be38072c184, duration, _question, _responseOptions) {
+    function MainnetSurvey(uint duration, string _question, bytes32[] _responseOptions) Survey(0x0a43edfe106d295e7c1e591a4b04b5598af9474c, duration, _question, _responseOptions) {
     }
 }
 
@@ -108,6 +108,6 @@ contract ETCSurvey is Survey {
 
 
 contract MainnetETCSurvey is ETCSurvey {
-    function MainnetETCSurvey() ETCSurvey(0xabf65a51c7adc3bdef0adf8992884be38072c184) {
+    function MainnetETCSurvey() ETCSurvey(0x0a43edfe106d295e7c1e591a4b04b5598af9474c) {
     }
 }

@@ -19,7 +19,7 @@ be mintable and the total supply will be forever fixed.
 This is a list of known projects and contracts that leverage the data from this
 contract.
 
-* ETC Survey @ [`0x0a4047c67e3be91777007e9529fd1d8ce6ded612`](https://etherscan.io/address/0x0a4047c67e3be91777007e9529fd1d8ce6ded612)
+* ETC Survey @ [`0xf2602d298541cd9d1fd742d78b2b1cd394d2ce3b`](https://etherscan.io/address/0xf2602d298541cd9d1fd742d78b2b1cd394d2ce3b)
 
 
 # Why
@@ -118,7 +118,7 @@ Now lets look at our full Survey contract.
 
 ```javascript
 contract Survey {
-    Devcon2Interface constant devcon2Token = Devcon2Interface(0xabf65a51c7adc3bdef0adf8992884be38072c184);
+    Devcon2Interface constant devcon2Token = Devcon2Interface(0x0a43edfe106d295e7c1e591a4b04b5598af9474c);
 
     // Mapping from tokenId to boolean noting whether this token has responded.
     mapping (bytes32 => bool) public hasResponded;
