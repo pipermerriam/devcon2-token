@@ -58,7 +58,7 @@
 * `0xc13de552a0ec8b782ffbfffeef0b00ded09e7a4b` - Bryan Lin
 * `0xf4ad6b315d1560f07fa725a1a56350e56a39a3a1` - Johan
 * `0x7cb57b5a97eabe94205c07890be4c1ad31e486a8` - Taylor Van Orden
-* `0x0b892db974847d91ba4eeee99e3249539fbddd79` - Jacob Horne
+* `0x0b892db974847d91ba4eeee99e3249539fbddd79` - █████ █████
 * `0x9a5e4d421d72bc1835e6a7b9658ca1924d12d0e0` - PascalVanHecke
 * `0x33473541f36e795e469f69a20b95fbdd1218d757` - Thessy
 * `0xb3ee92115eda643511324b1b886edb9216fa69ad` - Joseph Lubin
