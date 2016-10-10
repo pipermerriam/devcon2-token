@@ -288,9 +288,9 @@ contract Devcon2Token is TokenInterface {
 
 
 contract Devcon2TokenForTesting is Devcon2Token {
-    uint public END_MINTING;
+    uint public _END_MINTING;
 
     function Devcon2TokenForTesting() Devcon2Token() {
-        END_MINTING = now + 1 weeks;
+        _END_MINTING = now + 1 weeks;
     }
 }

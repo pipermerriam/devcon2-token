@@ -4,3 +4,7 @@ build/
 dist/
 chains/
 **/_build
+*.sqlite
+.env
+public/
+node_modules

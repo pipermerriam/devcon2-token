@@ -34,7 +34,7 @@ def test_cannot_destroy_after_window(chain,
     assert token.call().ownedToken(token_owner) == token_id
 
     with pytest.raises(ValueError):
-        token.transact().destroy(token_id)
+        txn_hash = token.transact().destroy(token_id)
 
     assert token.call().identityOf(token_id) == 'Piper Merriam'
     assert token.call().ownerOf(token_id) == token_owner

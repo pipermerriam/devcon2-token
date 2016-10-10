@@ -53,8 +53,8 @@ def main(ctx, ipc_path, token_address):
     )
     click.echo("Waiting for ipc connection: {0}".format(web3.currentProvider.ipc_path))
     wait_for_ipc(web3.currentProvider.ipc_path)
-    click.echo("Waiting for account unlock: {0}".format(web3.eth.coinbase))
-    wait.for_unlock()
+    #click.echo("Waiting for account unlock: {0}".format(web3.eth.coinbase))
+    #wait.for_unlock()
 
     ctx.web3 = web3
     ctx.wait = wait
