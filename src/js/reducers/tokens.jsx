@@ -1,10 +1,10 @@
 import TYPES from '../actions/types'
-import { getAllTokenIDs } from '../services/tokens'
+import { getAllTokenIds } from '../services/tokens'
+import Devcon2TokenIDs from '../../fixtures/devcon2_token_ids'
 
 var initialState = {
-  tokenIds: [],
+  tokenIds: [...Devcon2TokenIDs],
   tokens: {},
-  loaded: false,
 };
 
 export default function(state, action) {
@@ -15,22 +15,14 @@ export default function(state, action) {
   var newState = state;
 
   switch (action.type) {
-    case TYPES.LOAD_TOKENS:
-      console.log('LOADING TOKENS');
-      newState = Object.assign({}, newState, {loaded: true});
-      break;
-    case TYPES.SET_TOKEN:
-      console.log('SETTING TOKEN');
-      newState = Object.assign({}, newState, {
-        tokenIds: _.chain(newState.tokenIds).union([action.token]).uniq().value(),
-      });
-      break;
     case TYPES.SET_TOKEN_DATA:
       console.log('SETTING TOKEN DATA');
-      console.log(action.tokenId);
-      console.log(action.tokenData);
       newState = Object.assign({}, newState, {
-        tokens: Object.assign({}, newState.tokens, {[action.tokenId]: action.tokenData}),
+        tokens: Object.assign(
+          {},
+          newState.tokens,
+          {[action.tokenId]: action.tokenData},
+        ),
       });
       break;
   }

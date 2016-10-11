@@ -1,27 +1,58 @@
 import React from 'react'
-import { connect } from 'react-redux';
-import actions from '../actions';
+import { connect } from 'react-redux'
+import actions from '../actions'
+import TokenID from './TokenID'
+import EthereumAddress from './EthereumAddress'
 
 
-export default connect((state) => state.tokens)(React.createClass({
-  componentWillMount() {
-    if (this.props.loaded === false) {
-      this.props.dispatch(actions.loadTokens());
-    }
+function mapStateToTokenTableProps(state) {
+  return {
+    ...state.tokens,
+    ...state.pagination,
+  };
+}
+
+
+export default connect(mapStateToTokenTableProps)(React.createClass({
+  paginator() {
+    return this.props.paginators[this.props.address];
+  },
+  pageNumber() {
+    return _.get(this.paginator(), 'pageNumber', 1);
+  },
+  pageSize() {
+    return _.get(this.paginator(), 'pageSize', 10);
+  },
+  idxOffset() {
+    return (this.pageNumber() - 1) * this.pageSize();
+  },
+  tokenSlice() {
+    var leftBound = this.idxOffset();
+    var rightBound = leftBound + this.pageSize();
+    return _.slice(this.props.tokenIds, leftBound, rightBound);
+  },
+  renderRows() {
+    var idxOffset = this.idxOffset();
+    return _.map(this.tokenSlice(), function(tokenId, idx) {
+      return (
+        <TokenTableRow tokenIdx={idxOffset + idx + 1}
+                        tokenId={tokenId}
+                        key={tokenId} />
+      );
+    });
   },
   render() {
     return (
       <table className="table">
         <thead>
           <tr>
+            <th>#</th>
             <th>TokenID</th>
             <th>Owner</th>
           </tr>
         </thead>
         <tbody>
-          {this.props.tokenIds.map((tokenId) => (
-            <TokenTableRow tokenId={tokenId} key={tokenId} />
-          ))}
+          {this.renderRows()}
         </tbody>
       </table>
     );
@@ -31,26 +62,33 @@ export default connect((state) => state.tokens)(React.createClass({
 
 let TokenTableRow = connect((state) => state.tokens)(React.createClass({
   componentWillMount() {
-    if (this.props.tokens[this.props.tokenId] === undefined) {
+    if (this.tokenData() === undefined) {
       this.props.dispatch(actions.loadTokenData(this.props.tokenId));
     }
   },
+  tokenData() {
+    return this.props.tokens[this.props.tokenId];
+  },
   render() {
-    var tokenData = this.props.tokens[this.props.tokenId];
+    var tokenData = this.tokenData();
     if (tokenData === undefined) {
       return (
         <tr>
-          <td colSpan="2">Loading data for <code>{this.props.tokenId}</code></td>
+          <td>#{this.props.tokenIdx}</td>
+          <td colSpan="2">
+            Loading token data for <TokenID tokenID={this.props.tokenId} />
+          </td>
         </tr>
       )
     } else {
       return (
         <tr>
+          <td>#{this.props.tokenIdx}</td>
           <td>
-            {this.props.tokenId}
+            <TokenID tokenId={this.props.tokenId} />
           </td>
           <td>
-            {tokenData.owner}
+            <EthereumAddress address={tokenData.owner} imageSize={24} />
           </td>
         </tr>
       );

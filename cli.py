@@ -1,5 +1,6 @@
 import click
 import itertools
+import json
 
 import contextlib
 from gevent import socket
@@ -163,6 +164,9 @@ def report(ctx):
     for owner_address, token_id in minted_tokens:
         identity = token.call().identityOf(web3.toAscii(token_id))
         click.echo("{addr} - {identity}".format(addr=owner_address, identity=identity))
+
+    with open('tmp/report.json', 'w') as report_file:
+        json.dump(list(list(zip(*minted_tokens))[1]), report_file)
 
     click.echo("Total Gas Costs: {0}".format(total_gas_cost_in_ether))
     click.echo("Addresses Registered: {0}".format(len(minted_tokens)))
