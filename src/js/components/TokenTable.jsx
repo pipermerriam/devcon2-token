@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import actions from '../actions';
 
 
-export default connect(state => state.tokens)(React.createClass({
+export default connect((state) => state.tokens)(React.createClass({
   componentWillMount() {
     if (this.props.loaded === false) {
       this.props.dispatch(actions.loadTokens());
@@ -19,7 +19,9 @@ export default connect(state => state.tokens)(React.createClass({
           </tr>
         </thead>
         <tbody>
-          <TokenTableRow />
+          {this.props.tokenIds.map((tokenId) => (
+            <TokenTableRow tokenId={tokenId} key={tokenId} />
+          ))}
         </tbody>
       </table>
     );
@@ -27,17 +29,31 @@ export default connect(state => state.tokens)(React.createClass({
 }));
 
 
-let TokenTableRow = React.createClass({
+let TokenTableRow = connect((state) => state.tokens)(React.createClass({
+  componentWillMount() {
+    if (this.props.tokens[this.props.tokenId] === undefined) {
+      this.props.dispatch(actions.loadTokenData(this.props.tokenId));
+    }
+  },
   render() {
-    return (
-      <tr>
-        <td>
-          Some ID
-        </td>
-        <td>
-          Piper
-        </td>
-      </tr>
-    );
+    var tokenData = this.props.tokens[this.props.tokenId];
+    if (tokenData === undefined) {
+      return (
+        <tr>
+          <td colSpan="2">Loading data for <code>{this.props.tokenId}</code></td>
+        </tr>
+      )
+    } else {
+      return (
+        <tr>
+          <td>
+            {this.props.tokenId}
+          </td>
+          <td>
+            {tokenData.owner}
+          </td>
+        </tr>
+      );
+    }
   }
-});
+}));

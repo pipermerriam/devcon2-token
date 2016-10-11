@@ -12,7 +12,7 @@ module.exports = {
     library: 'Root',
   },
   resolve: {
-    extensions: ['', '.js', '.jsx', '.css', 'index.js', 'index.jsx'],
+    extensions: ['', '.js', '.jsx', '.json', '.css', 'index.js', 'index.jsx'],
   },
   module: {
     loaders: [

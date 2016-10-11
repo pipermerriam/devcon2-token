@@ -1,3 +1,5 @@
 export default {
   LOAD_TOKENS: 'LOAD_TOKENS',
+  SET_TOKEN: 'SET_TOKEN',
+  SET_TOKEN_DATA: 'SET_TOKEN_DATA',
 }
