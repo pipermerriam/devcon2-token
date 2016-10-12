@@ -155,7 +155,7 @@ STATIC_S3_PATH = "static"
 AWS_ACCESS_KEY_ID = env.get('AWS_ACCESS_KEY_ID', type=str, default=None)
 AWS_SECRET_ACCESS_KEY = env.get('AWS_SECRET_ACCESS_KEY', type=str, default=None)
 AWS_STORAGE_BUCKET_NAME = env.get('AWS_STORAGE_BUCKET_NAME', type=str, default=None)
-AWS_DEFAULT_REGION = env.get('AWS_DEFAULT_REGION', type=str, default=None)
+#AWS_DEFAULT_REGION = env.get('AWS_DEFAULT_REGION', type=str, default=None)
 
 # Boto config
 AWS_REDUCED_REDUNDANCY = True
@@ -168,6 +168,6 @@ AWS_HEADERS = {
     "Cache-Control": "public, max-age=86400",
 }
 
-if AWS_DEFAULT_REGION:
-    # Fix for https://github.com/boto/boto/issues/621
-    AWS_S3_HOST = "s3-{0}.amazonaws.com".format(AWS_DEFAULT_REGION)
+#if AWS_DEFAULT_REGION:
+#    # Fix for https://github.com/boto/boto/issues/621
+#    AWS_S3_HOST = "s3-{0}.amazonaws.com".format(AWS_DEFAULT_REGION)
