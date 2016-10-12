@@ -4,9 +4,7 @@
   "description": "Explorer for Devcon2 tokens",
   "main": "index.js",
   "directories": {
-    "start": "node index.js",
-    "test": "mocha",
-    "postinstall": "webpack"
+    "lib": "src"
   },
   "dependencies": {
     "babel-core": "^6.17.0",
@@ -44,7 +42,8 @@
     "webpack": "^1.13.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "webpack"
   },
   "repository": {
     "type": "git",
