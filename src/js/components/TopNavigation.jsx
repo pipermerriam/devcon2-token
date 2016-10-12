@@ -18,15 +18,17 @@ export default connect(state => state.web3)(React.createClass({
       return null;
     } else {
       return (
-        <div className="form-group">
-          <label htmlFor="web3-connection">Web3 Connection</label>
-          <select className="form-control" id="web3-connection" defaultValue={this.props.selectedWeb3} onChange={this.updateWeb3}>
-            {_.map(this.props.web3Options, _.spread(function(display, choice) {
-              return (
-                <option value={choice} key={choice}>{display}</option>
-              );
-            }))}
-          </select>
+        <div className="form-inline">
+          <div className="form-group">
+            <label htmlFor="web3-connection">Web3 Connection</label>
+            <select className="form-control" id="web3-connection" defaultValue={this.props.selectedWeb3} onChange={this.updateWeb3}>
+              {_.map(this.props.web3Options, _.spread(function(display, choice) {
+                return (
+                  <option value={choice} key={choice}>{display}</option>
+                );
+              }))}
+            </select>
+          </div>
         </div>
       );
     }
@@ -35,7 +37,9 @@ export default connect(state => state.web3)(React.createClass({
     return (
       <nav className="navbar navbar-dark bg-inverse">
         <a className="navbar-brand" href="#">Devcon2 Tokens</a>
-        {this.renderWeb3Select()}
+        <div className="pull-xs-right">
+          {this.renderWeb3Select()}
+        </div>
       </nav>
     );
   }
