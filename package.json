@@ -4,7 +4,7 @@
   "description": "Explorer for Devcon2 tokens",
   "main": "index.js",
   "directories": {
-    "postinstall": "webpack"
+    "heroku-postbuild": "webpack"
   },
   "dependencies": {
     "babel-core": "^6.17.0",
