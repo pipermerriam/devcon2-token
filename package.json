@@ -4,7 +4,9 @@
   "description": "Explorer for Devcon2 tokens",
   "main": "index.js",
   "directories": {
-    "heroku-postbuild": "webpack"
+    "start": "node index.js",
+    "test": "mocha",
+    "postinstall": "webpack"
   },
   "dependencies": {
     "babel-core": "^6.17.0",
