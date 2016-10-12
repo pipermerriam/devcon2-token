@@ -28,6 +28,11 @@ DEBUG = env.get('DJANGO_DEBUG', type=bool)
 
 ALLOWED_HOSTS = env.get('DJANGO_ALLOWED_HOSTS', type=list, required=not DEBUG)
 
+SECURE_SSL_REDIRECT = env.get(
+    'DJANGO_SECURE_SSL_REDIRECT',
+    type=bool,
+    default=True,
+)
 
 # Application definition
 
