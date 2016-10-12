@@ -12,7 +12,6 @@ env:
 cache:
   - pip: true
   - directories:
-    - $HOME/.ethash
     - .tox
     - $TRAVIS_BUILD_DIR/solc-versions/solc-0.3.6/
     - $TRAVIS_BUILD_DIR/solc-versions/solidity-0.3.6/build/
@@ -23,8 +22,6 @@ install:
 before_script:
   - ls -lah $TRAVIS_BUILD_DIR/solc-versions/solc-0.3.6/
   - ./solc-versions/solc-0.3.6/solc --version
-  - mkdir -p $HOME/.ethash
-  - geth makedag 0 $HOME/.ethash
 script:
   - tox -e $TOX_ENV
 after_script:
