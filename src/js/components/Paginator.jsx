@@ -3,7 +3,14 @@ import { connect } from 'react-redux'
 import _ from 'lodash'
 import actions from '../actions'
 
-export default connect((state) => state.pagination)(React.createClass({
+function mapStateToPaginatorProps(state) {
+  return {
+    ...state.pagination,
+    routing: state.routing,
+  }
+}
+
+export default connect(mapStateToPaginatorProps)(React.createClass({
   componentWillMount() {
     this.props.dispatch(actions.setItemCount(this.props.itemCount));
   },

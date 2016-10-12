@@ -5,6 +5,7 @@ import Devcon2TokenIDs from '../../fixtures/devcon2_token_ids'
 var initialState = {
   tokenIds: [...Devcon2TokenIDs],
   tokens: {},
+  tokenMeta: null,
 };
 
 export default function(state, action) {
@@ -23,6 +24,12 @@ export default function(state, action) {
           newState.tokens,
           {[action.tokenId]: action.tokenData},
         ),
+      });
+      break;
+    case TYPES.SET_TOKEN_META:
+      console.log('SETTING TOKEN META');
+      newState = Object.assign({}, newState, {
+        tokenMeta: Object.assign({}, newState.tokenMeta || {}, action.tokenMeta),
       });
       break;
   }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router'
 import actions from '../actions'
 import TokenID from './TokenID'
 import EthereumAddress from './EthereumAddress'
@@ -14,6 +15,11 @@ function mapStateToTokenTableProps(state) {
 
 
 export default connect(mapStateToTokenTableProps)(React.createClass({
+  getDefaultProps() {
+    return {
+      address: '0x0a43edfe106d295e7c1e591a4b04b5598af9474c',
+    }
+  },
   paginator() {
     return this.props.paginators[this.props.address];
   },
@@ -85,10 +91,14 @@ let TokenTableRow = connect((state) => state.tokens)(React.createClass({
         <tr>
           <td>#{this.props.tokenIdx}</td>
           <td>
-            <TokenID tokenId={this.props.tokenId} />
+            <Link to={`/tokens/${this.props.tokenId}`}>
+              <TokenID tokenId={this.props.tokenId} />
+            </Link>
           </td>
           <td>
-            <EthereumAddress address={tokenData.owner} imageSize={24} />
+            <Link to={`/tokens/${this.props.tokenId}`}>
+              <EthereumAddress address={tokenData.owner} imageSize={24} />
+            </Link>
           </td>
         </tr>
       );

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "react-router-redux": "^4.0.6"
+  }
+}

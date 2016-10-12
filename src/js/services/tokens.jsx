@@ -7,15 +7,58 @@ export function getDevcon2Token(web3) {
   return Promise.resolve(devcon2Token);
 }
 
-export function getTokenData(tokenId, web3) {
+export function getTokenOwner(tokenId, web3) {
   return new Promise(function(resolve, reject) {
-    if (web3 === null) {
-      reject("Got null web3 object");
-    }
     getDevcon2Token(web3).then(function(devcon2Token) {
       devcon2Token.ownerOf.call(tokenId, function(err, result) {
         if (!err) {
-          resolve({owner: result})
+          resolve(result)
+        } else {
+          reject(err);
+        }
+      });
+    });
+  });
+}
+
+export function getTokenIdentity(tokenId, web3) {
+  return new Promise(function(resolve, reject) {
+    getDevcon2Token(web3).then(function(devcon2Token) {
+      devcon2Token.identityOf.call(tokenId, function(err, result) {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(err);
+        }
+      });
+    });
+  });
+}
+
+export function getTokenData(tokenId, web3) {
+  return new Promise(function(resolve, reject) {
+    getDevcon2Token(web3).then(function(devcon2Token) {
+      Promise.all([
+        getTokenOwner(tokenId, web3),
+        getTokenIdentity(tokenId, web3),
+      ]).then(_.spread(function(owner, identity) {
+        resolve({
+          owner,
+          identity,
+        });
+      }), function(error) {
+        reject(error);
+      });
+    });
+  });
+}
+
+export function getTokenMeta(web3) {
+  return new Promise(function(resolve, reject) {
+    getDevcon2Token(web3).then(function(devcon2Token) {
+      devcon2Token.totalSupply.call(function(err, result) {
+        if (!err) {
+          resolve({totalSupply: result})
         } else {
           reject(err);
         }

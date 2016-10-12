@@ -1,7 +1,7 @@
 import React from 'react'
 import EthereumAddressIcon from './EthereumAddressIcon'
 import EthereumChecksumAddress from './EthereumChecksumAddress'
-import '../../css/ethereum-address.css'
+import '../../css/ethereum-address'
 
 
 export default React.createClass({
@@ -19,6 +19,7 @@ export default React.createClass({
       <div className="ethereum-address">
         <EthereumAddressIcon address={this.props.address} imageSize={this.props.imageSize} />
         <EthereumChecksumAddress address={this.props.address} />
+        <div className="clearfix"></div>
       </div>
     );
   }

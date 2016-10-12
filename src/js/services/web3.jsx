@@ -34,7 +34,10 @@ export function getWeb3Options() {
   return new Promise(function(resolve, reject) {
     var choices = []
     if (window !== undefined && window.web3 !== undefined) {
-      choices = [...choices, ['Browser', BROWSER]];
+      var providerName = _.get(web3, 'currentProvider.constructor.name')
+      var isMetamask = _.startsWith(providerName, 'Metamask')
+      var displayName = isMetamask ? 'Metamask' : 'Browser'
+      choices = [...choices, [displayName, BROWSER]];
     }
     choices = [
       ...choices,
