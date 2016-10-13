@@ -1,5 +1,7 @@
 # Devcon2 Token @ [`0x0a43edfe106d295e7c1e591a4b04b5598af9474c`](https://etherscan.io/address/0x0a43edfe106d295e7c1e591a4b04b5598af9474c)
 
+[Token Explorer](http://devcon2-token.com/)
+
 An token issued to each person attending Devcon2.
 
 The tokens are housed in an [ERC20](https://github.com/ethereum/EIPs/issues/20)
