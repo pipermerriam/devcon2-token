@@ -1,5 +1,6 @@
 import click
 import itertools
+import json
 
 import contextlib
 from gevent import socket
@@ -53,8 +54,8 @@ def main(ctx, ipc_path, token_address):
     )
     click.echo("Waiting for ipc connection: {0}".format(web3.currentProvider.ipc_path))
     wait_for_ipc(web3.currentProvider.ipc_path)
-    click.echo("Waiting for account unlock: {0}".format(web3.eth.coinbase))
-    wait.for_unlock()
+    #click.echo("Waiting for account unlock: {0}".format(web3.eth.coinbase))
+    #wait.for_unlock()
 
     ctx.web3 = web3
     ctx.wait = wait
@@ -163,6 +164,9 @@ def report(ctx):
     for owner_address, token_id in minted_tokens:
         identity = token.call().identityOf(web3.toAscii(token_id))
         click.echo("{addr} - {identity}".format(addr=owner_address, identity=identity))
+
+    with open('tmp/report.json', 'w') as report_file:
+        json.dump(list(list(zip(*minted_tokens))[1]), report_file)
 
     click.echo("Total Gas Costs: {0}".format(total_gas_cost_in_ether))
     click.echo("Addresses Registered: {0}".format(len(minted_tokens)))

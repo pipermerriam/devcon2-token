@@ -1,0 +1,7 @@
+{% load argonauts %}
+<div id="{{ uuid }}"></div>
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    ReactDOM.render(React.createElement({{ component_name }}, {{ props|json }}), document.getElementById('{{ uuid }}'));
+  });
+</script>

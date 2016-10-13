@@ -1,0 +1,28 @@
+{% load staticfiles argonauts %}<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Devcon2 Token Explorer{% endblock %}</title>
+        <link href="{% static 'css/stylesheet.css' %}" rel="stylesheet">
+
+        {% block extra_css %}
+        {% endblock %}
+    </head>
+
+    <body>
+    {% block body %}
+      <div id="contentWrapper">
+        {% block content-wrapper %}
+        {% endblock %}
+      </div>
+<script>
+window.ENV_CONFIG = {{ env_config|json }};
+</script>
+        <script src="{% static 'js/app.bundle.js' %}"></script>
+
+        {% block extra_javascript %}
+        {% endblock %}
+    {% endblock body %}
+    </body>
+</html>
+
