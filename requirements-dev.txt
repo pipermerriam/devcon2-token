@@ -1,3 +1,4 @@
-populus>=1.2.2
 eth-testrpc>=0.8.7
 ethereum-tester-client>=1.2.5
+populus>=1.2.2
+tox==2.4.1

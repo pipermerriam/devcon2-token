@@ -19,6 +19,7 @@ install:
   - ./bin/install_solc.sh
   - travis_retry pip install setuptools --upgrade
   - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
 before_script:
   - ls -lah $TRAVIS_BUILD_DIR/solc-versions/solc-0.3.6/
   - ./solc-versions/solc-0.3.6/solc --version
