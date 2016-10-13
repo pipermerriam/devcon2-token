@@ -1,6 +1,7 @@
-pragma solidity ^4.0.0;
-
-
+/*
+ *  DO NOT MODIFY.  THESE ARE PRESENT TO PRESERVE THE ORIGINAL SOURCE CODE OF
+ *  THE ORIGINAL TOKEN CONTRACT.
+ */
 library TokenLib {
     struct Token {
         string identity;
