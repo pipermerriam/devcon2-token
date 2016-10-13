@@ -1,7 +1,14 @@
 import pytest
 
 
-def test_destroying_token(chain, token, token_id, token_owner, get_destroy_data, NULL_TOKEN):
+def test_destroying_token(chain,
+                          token_v1,
+                          token_id,
+                          token_v1_owner,
+                          get_destroy_data,
+                          NULL_TOKEN):
+    token = token_v1
+    token_owner = token_v1_owner
     assert token.call().identityOf(token_id) == 'Piper Merriam'
     assert token.call().ownerOf(token_id) == token_owner
     assert token.call().isTokenOwner(token_owner) is True
@@ -20,11 +27,14 @@ def test_destroying_token(chain, token, token_id, token_owner, get_destroy_data,
 
 
 def test_cannot_destroy_after_window(chain,
-                                     token,
+                                     token_v1,
                                      token_id,
-                                     token_owner,
+                                     token_v1_owner,
                                      get_destroy_data,
                                      set_timestamp):
+    token = token_v1
+    token_owner = token_v1_owner
+
     # fastforward to the end of the window
     set_timestamp(token.call().END_MINTING())
 
@@ -44,11 +54,14 @@ def test_cannot_destroy_after_window(chain,
 
 def test_cannot_destroy_if_not_minter(chain,
                                       web3,
-                                      token,
+                                      token_v1,
                                       token_id,
-                                      token_owner,
+                                      token_v1_owner,
                                       get_destroy_data,
                                       set_timestamp):
+    token = token_v1
+    token_owner = token_v1_owner
+
     # fastforward to the end of the window
     set_timestamp(token.call().END_MINTING())
 

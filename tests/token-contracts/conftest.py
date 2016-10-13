@@ -19,7 +19,7 @@ from testrpc import testrpc
 
 
 @pytest.fixture()
-def token(chain, web3):
+def token_v1(chain, web3):
     token = chain.get_contract('Devcon2TokenForTesting')
     chain_code = web3.eth.getCode(token.address)
     assert len(chain_code) > 10
@@ -39,22 +39,25 @@ def TokenLib(token_lib):
 
 
 @pytest.fixture()
-def token_owner(chain, web3, token, get_mint_data):
-    assert token.call().isTokenOwner(web3.eth.coinbase) is False
+def token_v1_owner(chain, web3, token_v1, get_event_data):
+    token = token_v1
+    assert token.call().isTokenOwner(web3.eth.accounts[1]) is False
 
-    mint_txn_hash = token.transact().mint(web3.eth.coinbase, 'Piper Merriam')
+    mint_txn_hash = token.transact().mint(web3.eth.accounts[1], 'Piper Merriam')
     chain.wait.for_receipt(mint_txn_hash)
 
-    mint_data = get_mint_data(mint_txn_hash)
-    assert mint_data['args']['_to'] == web3.eth.coinbase
+    mint_data = get_event_data('Mint', token_v1, mint_txn_hash)
+    assert mint_data['args']['_to'] == web3.eth.accounts[1]
 
-    assert token.call().isTokenOwner(web3.eth.coinbase) is True
+    assert token.call().isTokenOwner(web3.eth.accounts[1]) is True
 
-    return web3.eth.coinbase
+    return web3.eth.accounts[1]
 
 
 @pytest.fixture()
-def token_id(token, token_owner):
+def token_id(token_v1, token_v1_owner):
+    token = token_v1
+    token_owner = token_v1_owner
     token_id = token.call().ownedToken(token_owner)
     owner = token.call().ownerOf(token_id)
 
@@ -63,22 +66,25 @@ def token_id(token, token_owner):
 
 
 @pytest.fixture()
-def other_token_owner(chain, web3, token, get_mint_data):
-    assert token.call().isTokenOwner(web3.eth.accounts[5]) is False
+def other_token_v1_owner(chain, web3, token_v1, get_event_data):
+    token = token_v1
+    assert token.call().isTokenOwner(web3.eth.accounts[2]) is False
 
-    mint_txn_hash = token.transact().mint(web3.eth.accounts[5], 'Vitalik Buterin')
+    mint_txn_hash = token.transact().mint(web3.eth.accounts[2], 'Vitalik Buterin')
     chain.wait.for_receipt(mint_txn_hash)
 
-    mint_data = get_mint_data(mint_txn_hash)
-    assert mint_data['args']['_to'] == web3.eth.accounts[5]
+    mint_data = get_event_data('Mint', token_v1, mint_txn_hash)
+    assert mint_data['args']['_to'] == web3.eth.accounts[2]
 
-    assert token.call().isTokenOwner(web3.eth.accounts[5]) is True
+    assert token.call().isTokenOwner(web3.eth.accounts[2]) is True
 
-    return web3.eth.accounts[5]
+    return web3.eth.accounts[2]
 
 
 @pytest.fixture()
-def other_token_id(token, other_token_owner):
+def other_token_id(token_v1, other_token_v1_owner):
+    token = token_v1
+    other_token_owner = other_token_v1_owner
     other_token_id = token.call().ownedToken(other_token_owner)
     owner = token.call().ownerOf(other_token_id)
 
@@ -87,7 +93,8 @@ def other_token_id(token, other_token_owner):
 
 
 @pytest.fixture()
-def unknown_token_id(token, web3):
+def unknown_token_id(token_v1, web3):
+    token = token_v1
     unknown_token_id = decode_hex(web3.sha3(encode_hex('Hudson James')))
 
     assert unknown_token_id == sha3_256(b'Hudson James').digest()
@@ -98,22 +105,13 @@ def unknown_token_id(token, web3):
 
 
 @pytest.fixture()
-def survey(chain, web3, token, token_owner, other_token_owner):
-    survey = chain.get_contract('Survey', deploy_args=(
-        token.address,
-        60 * 60 * 24 * 7,  # 1 week
-        'What is your favorite color?',
-        ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Rainbow'],
-    ))
-
-    chain_bytecode = web3.eth.getCode(survey.address)
-    assert len(chain_bytecode) >= 10
-    return survey
+def NULL_TOKEN():
+    return '\x00' * 32
 
 
 @pytest.fixture()
-def NULL_TOKEN():
-    return '\x00' * 32
+def NULL_ADDRESS():
+    return '0x' + '0' * 40
 
 
 @pytest.fixture()
@@ -130,41 +128,6 @@ def get_event_data(chain, web3):
         event_data = log_entries[0]
         return event_data
     return _get_event_data
-
-
-@pytest.fixture()
-def get_mint_data(get_event_data, token):
-    return functools.partial(get_event_data, 'Mint', token)
-
-
-@pytest.fixture()
-def get_destroy_data(get_event_data, token):
-    return functools.partial(get_event_data, 'Destroy', token)
-
-
-@pytest.fixture()
-def get_minter_added_data(get_event_data, token):
-    return functools.partial(get_event_data, 'MinterAdded', token)
-
-
-@pytest.fixture()
-def get_minter_removed_data(get_event_data, token):
-    return functools.partial(get_event_data, 'MinterRemoved', token)
-
-
-@pytest.fixture()
-def get_transfer_data(get_event_data, TokenLib):
-    return functools.partial(get_event_data, 'Transfer', TokenLib)
-
-
-@pytest.fixture()
-def get_approval_data(get_event_data, TokenLib):
-    return functools.partial(get_event_data, 'Approval', TokenLib)
-
-
-@pytest.fixture()
-def get_response_data(get_event_data, survey):
-    return functools.partial(get_event_data, 'Response', survey)
 
 
 @pytest.fixture()
