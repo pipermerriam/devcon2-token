@@ -40,7 +40,8 @@ def test_token_id_for_upgraded_and_transferred(chain,
                                                web3,
                                                token_v2,
                                                token_v1_owner,
-                                               upgraded_token):
+                                               upgraded_token,
+                                               NULL_TOKEN):
     chain.wait.for_receipt(token_v2.transact({
         'from': token_v1_owner,
     }).transfer(web3.eth.accounts[3]))
