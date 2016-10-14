@@ -183,8 +183,7 @@ def test_cannot_transfer_to_existing_token_owner(chain,
                                                  other_token_v1_owner,
                                                  spender,
                                                  approved_token_transfer,
-                                                 get_transfer_data,
-                                                 NULL_ADDRESS):
+                                                 get_transfer_data):
     assert token_v2.call().isTokenOwner(token_v1_owner) is True
     assert token_v2.call().isTokenOwner(other_token_v1_owner) is True
     assert token_v2.call().allowance(token_v1_owner, spender) == 1
@@ -197,6 +196,71 @@ def test_cannot_transfer_to_existing_token_owner(chain,
     assert token_v2.call().isTokenOwner(token_v1_owner) is True
     assert token_v2.call().isTokenOwner(other_token_v1_owner) is True
     assert token_v2.call().allowance(token_v1_owner, spender) == 1
+
+    with pytest.raises(AssertionError):
+        get_transfer_data(transfer_txn_hash)
+
+
+def test_cannot_transfer_to_non_upgraded_token_owner(chain,
+                                                     token_v2,
+                                                     token_v1_owner,
+                                                     other_token_id,
+                                                     other_token_v1_owner,
+                                                     spender,
+                                                     approved_token_transfer,
+                                                     get_transfer_data):
+    assert token_v2.call().isTokenOwner(token_v1_owner) is True
+    assert token_v2.call().isTokenOwner(other_token_v1_owner) is True
+    assert token_v2.call().allowance(token_v1_owner, spender) == 1
+    assert token_v2.call().isTokenUpgraded(other_token_id) is False
+
+    transfer_txn_hash = token_v2.transact({
+        'from': spender,
+    }).transferFrom(token_v1_owner, other_token_v1_owner)
+    chain.wait.for_receipt(transfer_txn_hash)
+
+    assert token_v2.call().isTokenOwner(token_v1_owner) is True
+    assert token_v2.call().isTokenOwner(other_token_v1_owner) is True
+    assert token_v2.call().allowance(token_v1_owner, spender) == 1
+
+    with pytest.raises(AssertionError):
+        get_transfer_data(transfer_txn_hash)
+
+
+def test_transfer_from_is_token_specific(chain,
+                                         web3,
+                                         token_v2,
+                                         token_v1_owner,
+                                         other_token_v1_owner,
+                                         upgraded_token,
+                                         upgraded_other_token,
+                                         spender,
+                                         approved_token_transfer,
+                                         get_transfer_data):
+    new_owner = web3.eth.accounts[4]
+
+    assert token_v2.call().isTokenOwner(token_v1_owner) is True
+    assert token_v2.call().isTokenOwner(new_owner) is False
+
+    chain.wait.for_receipt(token_v2.transact({
+        'from': token_v1_owner,
+    }).transfer(web3.eth.accounts[5]))
+
+    assert token_v2.call().isTokenOwner(token_v1_owner) is False
+
+    chain.wait.for_receipt(token_v2.transact({
+        'from': other_token_v1_owner,
+    }).transfer(token_v1_owner))
+
+    assert token_v2.call().isTokenOwner(token_v1_owner) is True
+
+    transfer_txn_hash = token_v2.transact({
+        'from': spender,
+    }).transferFrom(token_v1_owner, new_owner)
+    chain.wait.for_receipt(transfer_txn_hash)
+
+    assert token_v2.call().isTokenOwner(token_v1_owner) is True
+    assert token_v2.call().isTokenOwner(new_owner) is False
 
     with pytest.raises(AssertionError):
         get_transfer_data(transfer_txn_hash)
