@@ -18,6 +18,7 @@ def test_upgrading_from_v1(chain,
 
     assert token_v2.call().upgradeCount() == 1
     assert token_v2.call().isTokenUpgraded(token_id) is True
+    assert mint_data['args']['_owner'] == token_v1_owner
     assert mint_data['args']['_tokenID'] == token_id
     assert mint_data['address'] == token_v2.address
 
@@ -44,6 +45,7 @@ def test_auto_upgrade_on_transfer(chain,
 
     assert token_v2.call().upgradeCount() == 1
     assert token_v2.call().isTokenUpgraded(token_id) is True
+    assert mint_data['args']['_owner'] == token_v1_owner
     assert mint_data['args']['_tokenID'] == token_id
     assert mint_data['address'] == token_v2.address
 
@@ -70,6 +72,7 @@ def test_auto_upgrade_on_approval(chain,
 
     assert token_v2.call().upgradeCount() == 1
     assert token_v2.call().isTokenUpgraded(token_id) is True
+    assert mint_data['args']['_owner'] == token_v1_owner
     assert mint_data['args']['_tokenID'] == token_id
     assert mint_data['address'] == token_v2.address
 
@@ -92,6 +95,7 @@ def test_cannot_upgrade_same_token_twice(chain,
 
     assert token_v2.call().upgradeCount() == 1
     assert token_v2.call().isTokenUpgraded(token_id) is True
+    assert mint_data['args']['_owner'] == token_v1_owner
     assert mint_data['args']['_tokenID'] == token_id
     assert mint_data['address'] == token_v2.address
 

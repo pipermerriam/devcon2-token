@@ -5,7 +5,7 @@ contract IndividualityTokenInterface {
     /*
      *  Events
      */
-    event Mint(address indexed _to, bytes32 _tokenID);
+    event Mint(address indexed _owner, bytes32 _tokenID);
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -69,6 +69,14 @@ contract IndividualityTokenInterface {
 contract IndividualityTokenRootInterface is IndividualityTokenInterface {
     /// @dev Imports a token from the Devcon2Token contract.
     function upgrade() public returns (bool success);
+
+    /// @dev Upgrades a token from the previous contract
+    /// @param _owner the address of the owner of the token on the original contract
+    /// @param _newOwner the address that should own the token on the new contract.
+    /// @param signature 65 byte signature of the tightly packed bytes (address(this) + _owner + _newOwner), signed by _owner
+    function proxyUpgrade(address _owner,
+                          address _newOwner,
+                          bytes signature) public returns (bool);
 
     /// @dev Returns the number of tokens that have been upgraded.
     function upgradeCount() constant returns (uint256 amount);

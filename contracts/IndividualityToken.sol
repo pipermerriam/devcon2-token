@@ -3,6 +3,7 @@ pragma solidity ^0.4.0;
 
 import {TokenInterface} from "contracts/TokenInterface.sol";
 import {IndividualityTokenRootInterface} from "contracts/IndividualityTokenInterface.sol";
+import {ECVerifyLib} from "contracts/ECVerifyLib.sol";
 
 
 library TokenEventLib {
@@ -55,7 +56,7 @@ contract IndividualityTokenRoot is IndividualityTokenRootInterface {
         } else if (!devcon2Token.isTokenOwner(_owner)) {
             // not a token owner on the original devcon2Token contract.
             return false;
-        } else if (tokenToOwner[bytes32(devcon2Token.balanceOf(_owner))] != 0x0) {
+        } else if (isTokenUpgraded(bytes32(devcon2Token.balanceOf(_owner)))) {
             // the token has already been upgraded.
             return false;
         } else {
@@ -313,9 +314,7 @@ contract IndividualityTokenRoot is IndividualityTokenRootInterface {
         }
     }
 
-    /*
-     * Pull in a token from the previous contract
-     */
+    /// @dev Upgrades a token from the previous contract
     function upgrade() public returns (bool success) {
         if (!devcon2Token.isTokenOwner(msg.sender)) {
             // not a token owner.
@@ -353,6 +352,56 @@ contract IndividualityTokenRoot is IndividualityTokenRootInterface {
         return true;
     }
 
+    /// @dev Upgrades a token from the previous contract
+    /// @param _owner the address of the owner of the token on the original contract
+    /// @param _newOwner the address that should own the token on the new contract.
+    /// @param signature 65 byte signature of the tightly packed bytes (address(this) + _owner + _newOwner), signed by _owner
+    function proxyUpgrade(address _owner,
+                          address _newOwner,
+                          bytes signature) public returns (bool) {
+        if (_owner == 0x0 || _newOwner == 0x0) {
+            // cannot work with null addresses.
+            return false;
+        } else if (!devcon2Token.isTokenOwner(_owner)) {
+            // not a token owner on the original devcon2Token contract.
+            return false;
+        }
+
+        bytes32 tokenID = bytes32(devcon2Token.balanceOf(_owner));
+
+        if (tokenID == 0x0) {
+            // (should not be possible since we already checked isTokenOwner
+            // but I like being explicit)
+            return false;
+        } else if (isTokenUpgraded(tokenID)) {
+            // the token has already been upgraded.
+            return false;
+        } else if (ownerToToken[_newOwner] != 0x0) {
+            // new owner already owns a token
+            return false;
+        } else if (isEligibleForUpgrade(_newOwner)) {
+            // cannot upgrade to account that is still has an upgradable token
+            // on the old system.
+            return false;
+        }
+
+        bytes32 signatureHash = sha3(address(this), _owner, _newOwner);
+
+        if (!ECVerifyLib.ecverify(signatureHash, signature, _owner)) {
+            return false;
+        }
+
+        // Assign the new token
+        tokenToOwner[tokenID] = _newOwner;
+        ownerToToken[_newOwner] = tokenID;
+
+        // increment the number of tokens that have been upgraded.
+        _upgradeCount += 1;
+
+        // Log it
+        Mint(_newOwner, tokenID);
+    }
+
     /// @dev Returns the number of tokens that have been upgraded.
     function upgradeCount() constant returns (uint256 _amount) {
         return _upgradeCount;
@@ -363,4 +412,9 @@ contract IndividualityTokenRoot is IndividualityTokenRootInterface {
     function isTokenUpgraded(bytes32 _tokenID) constant returns (bool isUpgraded) {
         return (tokenToOwner[_tokenID] != 0x0);
     }
+}
+
+
+contract MainnetIndividualityTokenRoot is 
+         IndividualityTokenRoot(0x0a43edfe106d295e7c1e591a4b04b5598af9474c) {
 }
