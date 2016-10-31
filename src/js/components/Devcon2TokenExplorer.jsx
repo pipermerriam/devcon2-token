@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import actions from '../actions'
 import Devcon2TokenTable from './Devcon2TokenTable'
-import Paginator from './Paginator'
 import { getWeb3 } from '../services/web3'
 import HideIfNoWeb3 from './HideIfNoWeb3'
 
@@ -19,9 +18,8 @@ export default HideIfNoWeb3(connect(mapStateToExplorerProps)(React.createClass({
   render() {
     return (
       <div>
-        <Devcon2TokenTable />
-        <Paginator paginatorKey={DEVCON2_TOKEN_ADDRESS} 
-                   itemCount={this.props.tokenIds.length} />
+        <Devcon2TokenTable paginatorKey={DEVCON2_TOKEN_ADDRESS}
+                           items={this.props.tokenIds} />
       </div>
     )
   },

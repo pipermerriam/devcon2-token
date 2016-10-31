@@ -1,5 +1,6 @@
+import _ from 'lodash'
 import TYPES from './types'
-import { getAllTokenIds, getTokenData, getTokenMeta } from '../services/tokens'
+import { getTokenData, getTokenMeta } from '../services/tokens'
 
 export function loadTokenMeta() {
   return function(dispatch, getState) {

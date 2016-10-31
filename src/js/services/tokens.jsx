@@ -66,3 +66,49 @@ export function getTokenMeta(web3) {
     });
   });
 }
+
+export function getIsTokenOwner(address, web3) {
+  return new Promise(function(resolve, reject) {
+    getDevcon2Token(web3).then(function(devcon2Token) {
+      devcon2Token.isTokenOwner.call(address, function(err, result) {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(err);
+        }
+      });
+    })
+  })
+}
+
+export function getTokenID(address, web3) {
+  return new Promise(function(resolve, reject) {
+    getDevcon2Token(web3).then(function(devcon2Token) {
+      devcon2Token.balanceOf.call(address, function(err, result) {
+        if (!err) {
+          resolve(web3.fromDecimal(result))
+        } else {
+          reject(err);
+        }
+      });
+    })
+  })
+}
+
+export function getAddressData(address, web3) {
+  return new Promise(function(resolve, reject) {
+    getDevcon2Token(web3).then(function(devcon2Token) {
+      Promise.all([
+        getIsTokenOwner(address, web3),
+        getTokenID(address, web3),
+      ]).then(_.spread(function(isTokenOwner, tokenId) {
+        resolve({
+          isTokenOwner,
+          tokenId,
+        });
+      }), function(error) {
+        reject(error);
+      });
+    });
+  });
+}
