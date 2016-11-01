@@ -1,6 +1,7 @@
-pragma solidity ^0.4.0;
-
-
+/*
+ *  DO NOT MODIFY.  THESE ARE PRESENT TO PRESERVE THE ORIGINAL SOURCE CODE OF
+ *  THE ORIGINAL TOKEN CONTRACT.
+ */
 import {TokenInterface} from "contracts/TokenInterface.sol";
 import {TokenLib} from "contracts/TokenLib.sol";
 

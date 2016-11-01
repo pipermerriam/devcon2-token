@@ -10,6 +10,7 @@ import App from './app'
 import Devcon2TokenIndex from './Devcon2TokenIndex'
 import Devcon2TokenExplorer from './Devcon2TokenExplorer'
 import Devcon2TokenDetail from './Devcon2TokenDetail'
+import AddressDetail from './AddressDetail'
 
 
 function createReduxStore() {
@@ -31,6 +32,7 @@ export default React.createClass({
             <IndexRoute component={Devcon2TokenIndex} />
             <Route path="tokens" component={Devcon2TokenExplorer} />
             <Route path="tokens/:id" component={Devcon2TokenDetail} />
+            <Route path="addresses/:address" component={AddressDetail} />
           </Route>
         </Router>
       </Provider>

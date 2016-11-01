@@ -1,7 +1,8 @@
 import pytest
 
 
-def test_adding_minter(chain, web3, token, get_minter_added_data):
+def test_adding_minter(chain, web3, token_v1, get_minter_added_data):
+    token = token_v1
     assert token.call().minters(web3.eth.accounts[1]) is False
     assert token.call().minters(web3.eth.coinbase) is True
 
@@ -14,7 +15,8 @@ def test_adding_minter(chain, web3, token, get_minter_added_data):
     assert minter_added_data['args']['who'] == web3.eth.accounts[1]
 
 
-def test_non_minter_cannot_add_minter(chain, web3, token, get_minter_added_data):
+def test_non_minter_cannot_add_minter(chain, web3, token_v1, get_minter_added_data):
+    token = token_v1
     assert token.call().minters(web3.eth.accounts[1]) is False
 
     add_txn_hash = token.transact({'from': web3.eth.accounts[1]}).addMinter(web3.eth.accounts[1])
@@ -26,7 +28,8 @@ def test_non_minter_cannot_add_minter(chain, web3, token, get_minter_added_data)
         get_minter_added_data(add_txn_hash)
 
 
-def test_removing_minter(chain, web3, token, get_minter_removed_data):
+def test_removing_minter(chain, web3, token_v1, get_minter_removed_data):
+    token = token_v1
     assert token.call().minters(web3.eth.accounts[1]) is False
 
     add_txn_hash = token.transact().addMinter(web3.eth.accounts[1])
@@ -43,7 +46,8 @@ def test_removing_minter(chain, web3, token, get_minter_removed_data):
     assert minter_removed_data['args']['who'] == web3.eth.accounts[1]
 
 
-def test_non_minter_cannot_remove_minter(chain, web3, token, get_minter_removed_data):
+def test_non_minter_cannot_remove_minter(chain, web3, token_v1, get_minter_removed_data):
+    token = token_v1
     assert token.call().minters(web3.eth.accounts[1]) is False
     assert token.call().minters(web3.eth.coinbase) is True
 

@@ -1,3 +1,6 @@
+pragma solidity ^0.4.0;
+
+
 contract Devcon2Interface {
     function isTokenOwner(address _owner) constant returns (bool);
     function ownedToken(address _owner) constant returns (bytes32 tokenId);

@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 import actions from '../actions'
+import PaginatedComponent from './Paginator'
 import TokenID from './TokenID'
 import EthereumAddress from './EthereumAddress'
 
@@ -14,38 +15,20 @@ function mapStateToTokenTableProps(state) {
 }
 
 
-export default connect(mapStateToTokenTableProps)(React.createClass({
+export default PaginatedComponent(connect(mapStateToTokenTableProps)(React.createClass({
   getDefaultProps() {
     return {
       address: '0x0a43edfe106d295e7c1e591a4b04b5598af9474c',
     }
   },
-  paginator() {
-    return this.props.paginators[this.props.address];
-  },
-  pageNumber() {
-    return _.get(this.paginator(), 'pageNumber', 1);
-  },
-  pageSize() {
-    return _.get(this.paginator(), 'pageSize', 10);
-  },
-  idxOffset() {
-    return (this.pageNumber() - 1) * this.pageSize();
-  },
-  tokenSlice() {
-    var leftBound = this.idxOffset();
-    var rightBound = leftBound + this.pageSize();
-    return _.slice(this.props.tokenIds, leftBound, rightBound);
-  },
   renderRows() {
-    var idxOffset = this.idxOffset();
-    return _.map(this.tokenSlice(), function(tokenId, idx) {
+    return _.map(this.props.items, _.spread(function(idx, tokenId) {
       return (
-        <TokenTableRow tokenIdx={idxOffset + idx + 1}
-                        tokenId={tokenId}
-                        key={tokenId} />
+        <TokenTableRow tokenIdx={idx + 1}
+                       tokenId={tokenId}
+                       key={tokenId} />
       );
-    });
+    }));
   },
   render() {
     return (
@@ -63,17 +46,17 @@ export default connect(mapStateToTokenTableProps)(React.createClass({
       </table>
     );
   }
-}));
+})));
 
 
 let TokenTableRow = connect((state) => state.tokens)(React.createClass({
   componentWillMount() {
-    if (this.tokenData() === undefined) {
+    if (_.isEmpty(this.props.tokenDetails[this.props.tokenId]) ) {
       this.props.dispatch(actions.loadTokenData(this.props.tokenId));
     }
   },
   tokenData() {
-    return this.props.tokens[this.props.tokenId];
+    return this.props.tokenDetails[this.props.tokenId];
   },
   render() {
     var tokenData = this.tokenData();
@@ -96,7 +79,7 @@ let TokenTableRow = connect((state) => state.tokens)(React.createClass({
             </Link>
           </td>
           <td>
-            <Link to={`/tokens/${this.props.tokenId}`}>
+            <Link to={`/addresses/${tokenData.owner}`}>
               <EthereumAddress address={tokenData.owner} imageSize={24} />
             </Link>
           </td>

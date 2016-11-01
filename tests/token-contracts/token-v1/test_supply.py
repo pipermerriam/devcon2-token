@@ -1,4 +1,6 @@
-def test_supply_tracking(chain, web3, token):
+def test_supply_tracking(chain, web3, token_v1):
+    token = token_v1
+
     assert token.call().totalSupply() == 0
 
     mint_0_txn_hash = token.transact().mint(web3.eth.accounts[1], 'Token-0')
@@ -17,7 +19,9 @@ def test_supply_tracking(chain, web3, token):
     assert token.call().totalSupply() == 3
 
 
-def test_supply_tracking_with_destruction(chain, web3, token, get_mint_data):
+def test_supply_tracking_with_destruction(chain, web3, token_v1, get_mint_data):
+    token = token_v1
+
     assert token.call().totalSupply() == 0
 
     mint_0_txn_hash = token.transact().mint(web3.eth.accounts[1], 'Token-0')

@@ -1,10 +1,11 @@
 import TYPES from '../actions/types'
 import { getAllTokenIds } from '../services/tokens'
 import Devcon2TokenIDs from '../../fixtures/devcon2_token_ids'
+import _ from 'lodash'
 
 var initialState = {
-  tokenIds: [...Devcon2TokenIDs],
-  tokens: {},
+  tokenIds: [..._.slice(Devcon2TokenIDs, 15)],
+  tokenDetails: {},
   tokenMeta: null,
 };
 
@@ -19,9 +20,9 @@ export default function(state, action) {
     case TYPES.SET_TOKEN_DATA:
       console.log('SETTING TOKEN DATA');
       newState = Object.assign({}, newState, {
-        tokens: Object.assign(
+        tokenDetails: Object.assign(
           {},
-          newState.tokens,
+          newState.tokenDetails,
           {[action.tokenId]: action.tokenData},
         ),
       });

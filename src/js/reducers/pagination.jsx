@@ -3,130 +3,105 @@ import TYPES from '../actions/types'
 
 var initialState = {
   paginators: {},
-};
+}
 
 
-const PAGINATOR_DEFAULTS = {
+export const PAGINATOR_DEFAULTS = {
   pageNumber: 1,
   pageSize: 10,
-  itemCount: undefined,
 }
 
-
-function computeNumPages(itemCount, pageSize, defaultNumPages) {
-  if (itemCount === undefined) {
-    return defaultNumPages;
-  }
-  return _.ceil(itemCount / pageSize);
+export function Paginator(options) {
+  Object.assign(this, PAGINATOR_DEFAULTS, options || {})
+  Object.assign(this, {
+    leftBound() {
+      return (this.pageNumber - 1) * this.pageSize
+    },
+    rightBound() {
+      return this.leftBound() + this.pageSize
+    },
+    idxOffset() {
+      return this.leftBound()
+    },
+    itemCount() {
+      return this.items.length
+    },
+    numPages() {
+      return _.ceil(this.itemCount() / this.pageSize)
+    },
+    pageItems() {
+      return _.slice(this.items, this.leftBound(), this.rightBound())
+    },
+    pageItemsWithIndices() {
+      return _.map(this.pageItems(), function(item, idx) {
+        return [idx, item]
+      })
+    },
+    setPageNumber(pageNumber) {
+      var newPageNumber = _.clamp(
+        pageNumber,
+        1,
+        this.numPages(),
+      )
+      return this.clone({pageNumber: newPageNumber})
+    },
+    clone(overrides) {
+      return new Paginator(Object.assign({}, {
+        pageNumber: this.pageNumber,
+        pageSize: this.pageSize,
+        items: this.items,
+      }, overrides))
+    },
+  })
+  return this
 }
-
 
 export default function(state, action) {
   if (state === undefined) {
-    return initialState;
+    return initialState
   }
 
-  var newState = state;
+  var newState = state
 
   switch (action.type) {
-    case TYPES.PAGINATION_INCREASE_PAGE_NUMBER:
-      console.log('INCREASING PAGE NUMBER');
-
-      var paginator = _.get(
-        newState.paginators,
-        action.paginatorKey,
-        {...PAGINATOR_DEFAULTS},
-      )
-      var newPageNumber = _.min([
-        paginator.pageNumber + 1,
-        computeNumPages(
-          paginator.itemCount,
-          paginator.pageSize,
-          paginator.pageNumber + 1,
-        ),
-      ]);
-      console.log(paginator.pageNumber, newPageNumber);
-
-      newState = {
-        ...newState,
-        paginators: {
-          ...newState.paginators,
-          [action.paginatorKey]: {...paginator, pageNumber: newPageNumber},
-        }
-      };
-      break;
-    case TYPES.PAGINATION_DECREASE_PAGE_NUMBER:
-      console.log('DECREASING PAGE NUMBER');
-
-      var paginator = _.get(
-        newState.paginators,
-        action.paginatorKey,
-        {...PAGINATOR_DEFAULTS},
-      )
-      var newPageNumber = _.max([
-        1,
-        paginator.pageNumber - 1,
-      ]);
-
-      newState = {
-        ...newState,
-        paginators: {
-          ...newState.paginators,
-          [action.paginatorKey]: {...paginator, pageNumber: newPageNumber},
-        }
-      };
-      break;
     case TYPES.PAGINATION_SET_PAGE_NUMBER:
-      console.log('SET PAGE NUMBER');
+      console.log('SET PAGE NUMBER')
 
       var paginator = _.get(
         newState.paginators,
         action.paginatorKey,
-        {...PAGINATOR_DEFAULTS},
-      )
-      var newPageNumber = _.clamp(
-        action.pageNumber,
-        1,
-        computeNumPages(
-          paginator.itemCount,
-          paginator.pageSize,
-          action.pageNumber,
-        ),
-      );
+        new Paginator(),
+      ).setPageNumber(action.pageNumber)
 
       newState = {
         ...newState,
         paginators: {
           ...newState.paginators,
-          [action.paginatorKey]: {...paginator, pageNumber: newPageNumber},
+          [action.paginatorKey]: paginator,
         }
-      };
-      break;
-    case TYPES.PAGINATION_SET_ITEM_COUNT:
-      console.log('SET ITEM COUNT');
+      }
+      break
+    case TYPES.PAGINATION_INITIALIZE_PAGINATOR:
+      console.log('INITIALIZING PAGINATOR')
 
-      var paginator = _.get(
-        newState.paginators,
-        action.paginatorKey,
-        {...PAGINATOR_DEFAULTS},
-      )
+      var paginator = new Paginator({
+        items: action.items,
+      })
 
       newState = {
         ...newState,
         paginators: {
           ...newState.paginators,
-          [action.paginatorKey]: {
-            ...paginator,
-            itemCount: action.itemCount,
+          [action.paginatorKey]: paginator.clone({
             pageNumber: _.min([
-              computeNumPages(action.itemCount, paginator.pageSize),
+              paginator.numPages(),
               paginator.pageNumber,
             ]),
-          },
+          }),
         }
-      };
-      break;
+      }
+      break
   }
 
-  return newState;
+  return newState
 }
