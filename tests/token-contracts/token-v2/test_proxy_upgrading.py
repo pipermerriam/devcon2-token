@@ -250,6 +250,7 @@ def test_rejects_if_new_owner_is_null_address(chain,
                                               token_v2,
                                               token_v1_owner,
                                               token_id,
+                                              other_token_v1_owner,
                                               get_mint_data,
                                               NULL_ADDRESS,
                                               eth_sign):
