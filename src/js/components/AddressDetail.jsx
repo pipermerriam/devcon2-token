@@ -1,13 +1,24 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router'
 import _ from 'lodash'
 import actions from '../actions'
 import TokenID from './TokenID'
 import EthereumAddress from './EthereumAddress'
 import HideIfNoWeb3 from './HideIfNoWeb3'
+import YesNoWithIcon from './YesNoWithIcon'
+import LoadingIfUndefined from './LoadingIfUndefined'
 
 
-export default HideIfNoWeb3(connect((state) => state.addresses)(React.createClass({
+function mapStateToProps(state) {
+  return {
+    addresses: state.addresses,
+    tokens: state.tokens,
+  }
+}
+
+
+export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
   componentWillMount() {
     if (_.isEmpty(this.addressData())) {
       this.props.dispatch(actions.loadAddressData(this.address()))
@@ -17,7 +28,10 @@ export default HideIfNoWeb3(connect((state) => state.addresses)(React.createClas
     return this.props.params.address
   },
   addressData() {
-    return this.props.addressDetails[this.address()]
+    return this.props.addresses.addressDetails[this.address()]
+  },
+  tokenData() {
+    return this.props.tokens.tokenDetails[this.addressData().tokenId]
   },
   renderBody() {
     var addressData = this.addressData()
@@ -26,10 +40,21 @@ export default HideIfNoWeb3(connect((state) => state.addresses)(React.createClas
         <p>Loading....</p>
       )
     } else if (addressData.isTokenOwner) {
+      var tokenData = this.tokenData()
       return (
         <dl className="row">
           <dt className="col-sm-3">Token ID</dt>
-          <dd className="col-sm-9"><TokenID tokenId={addressData.tokenId} length={null} /></dd>
+          <dd className="col-sm-9">
+            <Link to={`/tokens/${addressData.tokenId}`}>
+              <TokenID tokenId={addressData.tokenId} length={null} />
+            </Link>
+          </dd>
+          <dt className="col-sm-3">Has Been Upgraded</dt>
+          <dd className="col-sm-9">
+            <LoadingIfUndefined targetValue={tokenData}>
+              <YesNoWithIcon yesOrNo={_.get(tokenData, 'isTokenUpgraded')} />
+            </LoadingIfUndefined>
+          </dd>
         </dl>
       )
     } else {

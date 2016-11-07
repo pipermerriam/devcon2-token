@@ -1,5 +1,4 @@
 import TYPES from '../actions/types'
-import { getAllTokenIds } from '../services/tokens'
 import _ from 'lodash'
 
 var initialState = {

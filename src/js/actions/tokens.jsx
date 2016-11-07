@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import TYPES from './types'
-import { getTokenData, getTokenMeta } from '../services/tokens'
+import { getTokenData, getTokenMeta } from '../services/individuality_token_root'
 
 export function loadTokenMeta() {
   return function(dispatch, getState) {
@@ -23,7 +23,7 @@ export function setTokenMeta(tokenMeta) {
 export function loadTokenData(tokenId) {
   return function(dispatch, getState) {
     var state = getState()
-    getTokenData(tokenId, state.web3.web3).then(function(result) {
+    getTokenData(state.web3.web3, tokenId).then(function(result) {
       dispatch(setTokenData(tokenId, result))
     }, function(error) {
       console.error(error)

@@ -21,6 +21,10 @@ module.exports = {
         loader: ExtractTextPlugin.extract("style-loader", "css-loader!sass-loader"),
       },
       {
+        test: /\.less$/,
+        loader: ExtractTextPlugin.extract("style-loader", "css-loader!less-loader"),
+      },
+      {
         test: /\.json$/,
         loader: 'json-loader',
       },
@@ -34,6 +38,14 @@ module.exports = {
             ["transform-object-rest-spread", { "useBuiltIns": true }],
           ],
         },
+      },
+      {
+        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "url-loader?limit=10000&mimetype=application/font-woff&name=./[hash].[ext]",
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "file-loader?name=./[hash].[ext]",
       },
       {
         test: require.resolve('react'),

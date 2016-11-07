@@ -1,11 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router'
 import _ from 'lodash'
 import actions from '../actions'
 import TokenID from './TokenID'
 import EthereumAddress from './EthereumAddress'
 import HideIfNoWeb3 from './HideIfNoWeb3'
-
+import YesNoWithIcon from './YesNoWithIcon'
 
 export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
   componentWillMount() {
@@ -17,7 +18,19 @@ export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
     return this.props.params.id
   },
   tokenData() {
-    return this.props.tokens[this.tokenID()]
+    return this.props.tokenDetails[this.tokenID()]
+  },
+  renderUpgradeLink(tokenData) {
+    if (tokenData.isTokenUpgraded) {
+      return null;
+    } else {
+      const tokenID = this.tokenID()
+      return (
+        <span>
+          <small>(<Link to={`/tokens/${tokenID}/upgrade`}>upgrade</Link>)</small>
+        </span>
+      )
+    }
   },
   renderBody() {
     var tokenData = this.tokenData()
@@ -31,9 +44,18 @@ export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
           <dt className="col-sm-3">Token ID</dt>
           <dd className="col-sm-9"><TokenID tokenId={this.tokenID()} length={null} /></dd>
           <dt className="col-sm-3">Owner</dt>
-          <dd className="col-sm-9"><EthereumAddress address={tokenData.owner} imageSize={32} /></dd>
+          <dd className="col-sm-9">
+            <Link to={`/addresses/${tokenData.owner}`}>
+              <EthereumAddress address={tokenData.owner} imageSize={32} />
+            </Link>
+          </dd>
           <dt className="col-sm-3">Identity</dt>
           <dd className="col-sm-9"><pre><code>{tokenData.identity}</code></pre></dd>
+          <dt className="col-sm-3">Has Been Upgraded</dt>
+          <dd className="col-sm-9">
+            <YesNoWithIcon yesOrNo={tokenData.isTokenUpgraded} />
+            {this.renderUpgradeLink(tokenData)}
+          </dd>
         </dl>
       )
     }

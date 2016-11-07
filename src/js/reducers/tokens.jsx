@@ -1,5 +1,4 @@
 import TYPES from '../actions/types'
-import { getAllTokenIds } from '../services/tokens'
 import Devcon2TokenIDs from '../../fixtures/devcon2_token_ids'
 import _ from 'lodash'
 

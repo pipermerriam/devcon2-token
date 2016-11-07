@@ -5,7 +5,7 @@ import actions from '../actions'
 import PaginatedComponent from './Paginator'
 import TokenID from './TokenID'
 import EthereumAddress from './EthereumAddress'
-
+import YesNoWithIcon from './YesNoWithIcon'
 
 function mapStateToTokenTableProps(state) {
   return {
@@ -13,7 +13,6 @@ function mapStateToTokenTableProps(state) {
     ...state.pagination,
   };
 }
-
 
 export default PaginatedComponent(connect(mapStateToTokenTableProps)(React.createClass({
   getDefaultProps() {
@@ -38,6 +37,7 @@ export default PaginatedComponent(connect(mapStateToTokenTableProps)(React.creat
             <th>#</th>
             <th>TokenID</th>
             <th>Owner</th>
+            <th>Upgraded</th>
           </tr>
         </thead>
         <tbody>
@@ -47,7 +47,6 @@ export default PaginatedComponent(connect(mapStateToTokenTableProps)(React.creat
     );
   }
 })));
-
 
 let TokenTableRow = connect((state) => state.tokens)(React.createClass({
   componentWillMount() {
@@ -82,6 +81,9 @@ let TokenTableRow = connect((state) => state.tokens)(React.createClass({
             <Link to={`/addresses/${tokenData.owner}`}>
               <EthereumAddress address={tokenData.owner} imageSize={24} />
             </Link>
+          </td>
+          <td>
+            <YesNoWithIcon yesOrNo={tokenData.isTokenUpgraded} />
           </td>
         </tr>
       );
