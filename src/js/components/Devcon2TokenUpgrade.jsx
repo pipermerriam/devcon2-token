@@ -12,22 +12,22 @@ import ProxyTokenUpgradeForm from './ProxyTokenUpgradeForm'
 export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
   componentWillMount() {
     if (_.isEmpty(this.tokenData())) {
-      this.props.dispatch(actions.loadTokenData(this.tokenID()))
+      this.props.dispatch(actions.loadTokenData(this.tokenId()))
     }
   },
-  tokenID() {
+  tokenId() {
     return this.props.params.id
   },
   tokenData() {
-    return this.props.tokenDetails[this.tokenID()]
+    return this.props.tokenDetails[this.tokenId()]
   },
   renderAlreadyUpgraded() {
-    const tokenID = this.tokenID()
+    const tokenId = this.tokenId()
     return (
       <div>
         <div className="row">
-          <div className="col-sm-12">
-            <p>Token has already been upgraded.  <Link to={`/tokens/${tokenID}`}>Back to token details...</Link></p>
+          <div className="col-sm-12 alert alert-info" role="alert">
+            <p>Token has already been upgraded.  <Link to={`/tokens/${tokenId}`}>Back to token details...</Link></p>
           </div>
         </div>
       </div>
@@ -36,9 +36,9 @@ export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
   renderUpgradeForm(tokenData) {
     return (
       <div>
-        <h1>Upgrading token: <TokenID tokenId={this.tokenID()} length={null} /></h1>
-        <DirectTokenUpgradeForm tokenId={this.tokenID()} tokenData={tokenData}/>
-        <ProxyTokenUpgradeForm tokenId={this.tokenID()} tokenData={tokenData}/>
+        <h1>Upgrading Token: <TokenID tokenId={this.tokenId()} /></h1>
+        <DirectTokenUpgradeForm tokenId={this.tokenId()} tokenData={tokenData}/>
+        <ProxyTokenUpgradeForm tokenId={this.tokenId()} tokenData={tokenData}/>
       </div>
     )
   },

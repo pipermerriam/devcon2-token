@@ -126,7 +126,7 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
   renderSignatureControls() {
     if (this.isSigned()) {
       return (
-        <button className="btn btn-primary" type="button" onClick={this.submitUpgradeSignature}>Submit</button>
+        <button className="btn btn-primary" type="button" onClick={this.submitUpgradeSignature}>Upgrade</button>
       )
     } else {
       return (
@@ -197,7 +197,7 @@ let ManualSignatureForm = reduxForm({form: 'manual-signature'})(React.createClas
             <label htmlFor="upgradeSignature" className="col-form-label">Signature</label>
             <Field type="text" component="input" className="form-control" name="upgradeSignature" />
           </div>
-          <button className="btn btn-primary" type="submit">Save</button>
+          <button className="btn btn-primary" type="submit">Next</button>
         </form>
       </div>
     )
