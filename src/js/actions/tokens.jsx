@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import TYPES from './types'
-import { getTokenData, getTokenMeta } from '../services/individuality_token_root'
+import { getTokenData, getTokenMeta, submitProxyUpgradeSignature } from '../services/individuality_token_root'
+import { computeSha3 } from '../services/web3'
 
 export function loadTokenMeta() {
   return function(dispatch, getState) {
@@ -39,10 +40,69 @@ export function setTokenData(tokenId, tokenData) {
   }
 }
 
-export function setTokenUpgradeTarget(tokenId, upgradeTarget) {
+export function updateTokenUpgradeTarget(tokenId, target) {
+  return function(dispatch, getState) {
+    dispatch(setTokenUpgradeTarget(tokenId, target))
+    var state = getState()
+    var web3 = state.web3.web3
+    var tokenData = state.tokens.tokenDetails[tokenId]
+    var upgradeTarget = _.get(state.tokens.upgradeData, tokenId + '.target', tokenData.owner)
+    var bytesToSign = _.join([
+      web3.toAscii('0xC59162bbe31b2ECa8E3d7d3401DC05f64E293f83'),
+      web3.toAscii(tokenData.owner),
+      web3.toAscii(upgradeTarget),
+    ], '')
+    computeSha3(state.web3.web3, bytesToSign).then(function(dataHash) {
+      dispatch(setTokenUpgradeDataHash(tokenId, dataHash))
+    }, function(error) {
+      console.error(error)
+    })
+  }
+}
+
+export function setTokenUpgradeTarget(tokenId, target) {
   return {
     type: TYPES.SET_TOKEN_UPGRADE_TARGET,
     tokenId: tokenId,
-    upgradeTarget: upgradeTarget,
+    target: target,
+  }
+}
+
+export function setTokenUpgradeDataHash(tokenId, dataHash) {
+  return {
+    type: TYPES.SET_TOKEN_UPGRADE_DATA_HASH,
+    tokenId: tokenId,
+    dataHash: dataHash,
+  }
+}
+
+export function signTokenUpgradeData(tokenId, account, bytesToSign) {
+  return function(dispatch, getState) {
+    var web3 = getState().web3.web3
+    signData(web3, account, bytesToSign).then(function(signature) {
+      dispatch(setTokenUpgradeSignature(tokenId, bytesToSign, signature))
+    }, function(error) {
+      console.error(error)
+    })
+  }
+}
+
+export function setTokenUpgradeSignature(tokenId, signedBytes, signature) {
+  return {
+    type: TYPES.SET_TOKEN_UPGRADE_SIGNATURE,
+    tokenId: tokenId,
+    signedBytes: signedBytes,
+    signature: signature,
+  }
+}
+
+export function submitTokenUpgradeSignature(tokenId, signature) {
+  return function(dispatch, getState) {
+    var web3 = getState().web3.web3
+    submitProxyUpgradeSignature(web3, signature).then(function(transactionHash) {
+      dispatch(setTokenUpgradeTransactionHash(tokenId, transactionHash))
+    }, function(error) {
+      console.error(error)
+    })
   }
 }

@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
+import { reducer as formReducer } from 'redux-form'
 
 import tokens from './tokens'
 import addresses from './addresses'
@@ -13,4 +14,5 @@ export default combineReducers({
   web3,
   addresses,
   routing: routerReducer,
+  form: formReducer,
 })

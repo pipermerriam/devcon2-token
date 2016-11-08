@@ -113,3 +113,23 @@ export function getWeb3Accounts(web3) {
     })
   })
 }
+
+export function computeSha3(web3, bytesToSign) {
+  return Promise.resolve(web3.sha3(bytesToSign))
+}
+
+export function signData(web3, account, bytesToSign) {
+  return new Promise(function(resolve, reject) {
+    computeSha3(web3, bytesToSign).then(function(hashToSign) {
+      web3.eth.sign(account, hashToSign, function(err, signature) {
+        if (!err) {
+          resolve(signature)
+        } else {
+          reject(error)
+        }
+      })
+    }, function(error) {
+      reject(error)
+    })
+  })
+}

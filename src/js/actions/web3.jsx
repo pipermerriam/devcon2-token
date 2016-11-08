@@ -1,5 +1,5 @@
 import TYPES from './types'
-import { getWeb3Options, getDefaultWeb3, getWeb3, getWeb3Accounts } from '../services/web3'
+import { getWeb3Options, getDefaultWeb3, getWeb3, getWeb3Accounts, signData } from '../services/web3'
 
 export function initializeWeb3() {
   return function(dispatch, getState) {
@@ -49,14 +49,10 @@ export function setWeb3(web3) {
 
 export function getWeb3AccountList() {
   return function(dispatch, getState) {
-    console.log('here 1')
     var p = _.isEmpty(getState().web3.web3) ? dispatch(initializeWeb3()) : Promise.resolve()
-    console.log('here 2')
     return p.then(function() {
-      console.log('here 3')
       var web3 = getState().web3.web3
       getWeb3Accounts(web3).then(function(accounts) {
-        console.log('here 4')
         dispatch(setWeb3AccountList(accounts))
       }, function(error) {
         console.error(error)
