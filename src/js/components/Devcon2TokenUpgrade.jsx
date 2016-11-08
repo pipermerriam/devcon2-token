@@ -36,7 +36,7 @@ export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
   renderUpgradeForm(tokenData) {
     return (
       <div>
-        <h2>Upgrading token: <TokenID tokenId={this.tokenID()} length={null} /></h2>
+        <h1>Upgrading token: <TokenID tokenId={this.tokenID()} length={null} /></h1>
         <DirectTokenUpgradeForm tokenId={this.tokenID()} tokenData={tokenData}/>
         <ProxyTokenUpgradeForm tokenId={this.tokenID()} tokenData={tokenData}/>
       </div>

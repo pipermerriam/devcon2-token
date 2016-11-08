@@ -34,7 +34,7 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
     this.props.dispatch(actions.setTokenUpgradeSignature(this.props.tokenId, this.bytesToSign(), formData.upgradeSignature))
   },
   submitUpgradeSignature(event) {
-    this.props.dispatch(actions.submitTokenUpgradeSignature(this.props.tokenId, this.upgradeSignature()))
+    this.props.dispatch(actions.submitProxyUpgrade(this.props.tokenId, this.upgradeSignature()))
   },
   upgradeTarget() {
     return _.get(this.upgradeData(), 'target', this.props.tokenData.owner)
@@ -87,6 +87,19 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
       this.props.bytesToSign(),
     ))
   },
+  renderLocalSignatureControls() {
+    if (this.canSignLocally()) {
+      return (
+        <div>
+          <h4>Sign In Browser</h4>
+          <p>It looks like the account <EthereumChecksumAddress address={this.props.tokenData.owner} /> is available here in the browser.</p>
+          <button className="btn btn-primary" type="button" onClick={this.signData}>Sign Data</button>
+        </div>
+      )
+    } else {
+      return null
+    }
+  },
   renderSignatureHeader() {
     if (this.isSigned()) {
       var web3 = this.props.web3.web3
@@ -124,22 +137,11 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
       )
     }
   },
-  renderLocalSignatureControls() {
-    if (this.canSignLocally()) {
-      return (
-        <div>
-          <h4>Sign In Browser</h4>
-          <p>It looks like the account <EthereumChecksumAddress address={this.props.tokenData.owner} /> is available here in the browser.</p>
-          <button className="btn btn-primary" type="button" onClick={this.signData}>Sign Data</button>
-        </div>
-      )
-    } else {
-      return null
-    }
-  },
   render() {
     return (
-      <div>
+      <div className="row">
+        <h2 className="col-sm-12">Method #2: Proxy Upgrade</h2>
+        <p>This method involves submitting a cryptographic signature to the <code>proxyUpgrade()</code> function.</p>
         <SignatureParametersForm currentOwner={this.props.tokenData.owner} initialValues={this.signatureParams()} onSubmit={this.setSignatureParams} />
         {this.renderSignatureHeader()}
         {this.renderSignatureControls()}
@@ -148,32 +150,32 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
   },
 })))
 
-
 let SignatureParametersForm = reduxForm({form: 'proxy-signature-parameters'})(React.createClass({
   render() {
     return (
       <form onSubmit={this.props.handleSubmit}>
         <div className="row">
-          <h2 className="col-sm-12">Method #2: Proxy Upgrade</h2>
-          <p>This method involves submitting a cryptographic signature the <code>proxyUpgrade()</code> function.</p>
-          <p>Please sign the following value using the private key for the account <EthereumChecksumAddress address={this.props.previousOwner} /></p>
+          <h4>Signature Parameters</h4>
         </div>
         <div className="form-group row">
           <label htmlFor="contractAddress" className="col-sm-2 col-form-label">Contract Address</label>
           <div className="col-sm-10">
             <Field component="input" type="text" readOnly="true" className="form-control" name="contractAddress" placeholder="0x..."/>
+            <p className="form-text text-muted">The address of the upgraded token contract</p>
           </div>
         </div>
         <div className="form-group row">
           <label htmlFor="currentOwner" className="col-sm-2 col-form-label">Current Owner</label>
           <div className="col-sm-10">
             <Field component="input" type="text" readOnly="true" className="form-control" name="currentOwner" placeholder="0x..."/>
+            <p className="form-text text-muted">The address that owns the token being upgraded in the old token contract.</p>
           </div>
         </div>
         <div className="form-group row">
           <label htmlFor="tokenOwner" className="col-sm-2 col-form-label">New Owner</label>
           <div className="col-sm-10">
             <Field component="input" type="text" className="form-control" name="tokenOwner" placeholder="0x..." />
+            <p className="form-text text-muted">The address that will own the token after upgrading.</p>
           </div>
         </div>
         <button type="submit" className="btn btn-primary">Save</button>

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import TYPES from './types'
-import { getTokenData, getTokenMeta, submitProxyUpgradeSignature } from '../services/individuality_token_root'
+import { getTokenData, getTokenMeta, proxyUpgrade, directUpgrade } from '../services/individuality_token_root'
 import { computeSha3 } from '../services/web3'
 
 export function loadTokenMeta() {
@@ -99,7 +99,18 @@ export function setTokenUpgradeSignature(tokenId, signedBytes, signature) {
 export function submitTokenUpgradeSignature(tokenId, signature) {
   return function(dispatch, getState) {
     var web3 = getState().web3.web3
-    submitProxyUpgradeSignature(web3, signature).then(function(transactionHash) {
+    proxyUpgrade(web3, signature).then(function(transactionHash) {
+      dispatch(setTokenUpgradeTransactionHash(tokenId, transactionHash))
+    }, function(error) {
+      console.error(error)
+    })
+  }
+}
+
+export function triggerDirectUpgrade(tokenId, account) {
+  return function(dispatch, getState) {
+    var web3 = getState().web3.web3
+    directUpgrade(web3, account).then(function(transactionHash) {
       dispatch(setTokenUpgradeTransactionHash(tokenId, transactionHash))
     }, function(error) {
       console.error(error)

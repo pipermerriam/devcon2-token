@@ -57,7 +57,7 @@ export default function PaginatedComponent(WrappedComponent) {
         }
         return (
           <li className={_.join(classNames, ' ')} key={pageNumber}>
-            <a className='page-link' onClick={() => this.setPageNumber(pageNumber)}>{pageNumber}</a>
+            <a className='page-link' onClick={() => this.setPageNumber(pageNumber)} key={pageNumber}>{pageNumber}</a>
           </li>
         );
       }.bind(this));

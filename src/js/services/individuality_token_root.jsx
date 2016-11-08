@@ -144,10 +144,24 @@ export function getAddressData(web3, address) {
   })
 }
 
-export function submitProxyUpgradeSignature(web3, signature) {
+export function proxyUpgrade(web3, signature) {
   return new Promise(function(resolve, reject) {
     getIndividualityTokenRoot(web3).then(function(individualityTokenRoot) {
       individualityTokenRoot.proxyUpgrade.call(signature, function(err, result) {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(err)
+        }
+      })
+    })
+  })
+}
+
+export function directUpgrade(web3, account) {
+  return new Promise(function(resolve, reject) {
+    getIndividualityTokenRoot(web3).then(function(individualityTokenRoot) {
+      individualityTokenRoot.upgrade.call({from: account}, function(err, result) {
         if (!err) {
           resolve(result)
         } else {
