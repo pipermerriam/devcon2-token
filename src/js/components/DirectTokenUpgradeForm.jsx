@@ -19,9 +19,9 @@ export default connect((state) => state.web3)(React.createClass({
     })
   },
   renderWeb3Accounts() {
-    return _.map(this.props.accounts, function(account) {
+    return _.map(this.props.accounts, function(account, idx) {
       return (
-        <li><EthereumAddress address={account} imageSize={16} /></li>
+        <li><EthereumAddress address={account} imageSize={16} key={idx} /></li>
       )
     })
   },

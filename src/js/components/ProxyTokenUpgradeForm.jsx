@@ -13,7 +13,7 @@ function mapStateToProps(state) {
   }
 }
 
-export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
+export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
   setUpgradeTarget(event) {
     this.props.dispatch(actions.setTokenUpgradeTarget(this.props.tokenId, event.target.value))
   },
@@ -21,8 +21,22 @@ export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
     return _.get(this.props.upgradeTarget, this.props.tokenId, this.props.tokenData.owner)
   },
   bytesToSign() {
-    web3 = this.props.web3.web3
-    return web3.toAscii('0xC59162bbe31b2ECa8E3d7d3401DC05f64E293f83') + 
+    var web3 = this.props.web3.web3
+    return web3.toAscii('0xC59162bbe31b2ECa8E3d7d3401DC05f64E293f83') + web3.toAscii(this.props.tokenData.owner) + web3.toAscii(this.upgradeAddress())
+  },
+  hexToSign() {
+    var web3 = this.props.web3.web3
+    return web3.toHex(this.bytesToSign())
+  },
+  signData() {
+    var web3 = this.props.web3.web3
+    web3.eth.sign(this.props.web3.accounts[0], web3.sha3(this.bytesToSign()), function(err, result) {
+      if (!err) {
+        alert(result)
+      } else {
+        alert(err)
+      }
+    })
   },
   render() {
     return (
@@ -51,9 +65,9 @@ export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
           </div>
         </div>
         <ul>
-          <li>Raw Bytes: <code>Some bytes</code></li>
-          <li>Hex Encoded: <code>{this.upgradeAddress()}</code></li>
+          <li>Hex Encoded: <code>{this.hexToSign()}</code></li>
         </ul>
+        <button className="btn btn-primary" type="button" onClick={this.signData}>Sign</button>
       </div>
     )
   },
