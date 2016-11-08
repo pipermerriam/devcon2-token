@@ -4,6 +4,7 @@ var initialState = {
   selectedWeb3: null,
   web3Options: null,
   web3: null,
+  accounts: null,
 };
 
 export default function(state, action) {
@@ -29,6 +30,12 @@ export default function(state, action) {
       console.log('SETTING WEB3');
       newState = Object.assign({}, newState, {
         web3: action.web3,
+      });
+      break;
+    case TYPES.SET_WEB3_ETH_ACCOUNTS:
+      console.log('SETTING WEB3 ACCOUNTS');
+      newState = Object.assign({}, newState, {
+        accounts: action.accounts,
       });
       break;
   }

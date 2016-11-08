@@ -101,3 +101,15 @@ export function getDefaultWeb3() {
     })
   });
 }
+
+export function getWeb3Accounts(web3) {
+  return new Promise(function(resolve, reject) {
+    web3.eth.getAccounts(function(error, result) {
+      if (!error) {
+        resolve(result)
+      } else {
+        reject(error)
+      }
+    })
+  })
+}

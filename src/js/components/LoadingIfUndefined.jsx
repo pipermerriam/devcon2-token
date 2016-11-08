@@ -1,11 +1,12 @@
 import React from 'react'
+import LoadingSpinner from './LoadingSpinner'
 
 
 export default React.createClass({
   render() {
     if (_.isUndefined(this.props.targetValue)) {
       return (
-        <i className="fa fa-spinner fa-spin"></i>
+        <LoadingSpinner />
       )
     } else {
       return (

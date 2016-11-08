@@ -38,3 +38,11 @@ export function setTokenData(tokenId, tokenData) {
     tokenData: tokenData,
   }
 }
+
+export function setTokenUpgradeTarget(tokenId, upgradeTarget) {
+  return {
+    type: TYPES.SET_TOKEN_UPGRADE_TARGET,
+    tokenId: tokenId,
+    upgradeTarget: upgradeTarget,
+  }
+}
