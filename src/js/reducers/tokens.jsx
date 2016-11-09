@@ -33,20 +33,12 @@ export default function(state, action) {
         {tokenMeta: action.tokenMeta},
       )
       break;
-    case TYPES.SET_TOKEN_UPGRADE_TARGET:
-      console.log('SETTING TOKEN UPGRADE TARGET');
+    case TYPES.SET_TOKEN_UPGRADE_PARAMETERS:
+      console.log('SETTING TOKEN UPGRADE PARAMETERS');
       newState = _.merge(
         {},
         newState,
-        {upgradeData: {[action.tokenId]: {target: action.target}}}
-      );
-      break;
-    case TYPES.SET_TOKEN_UPGRADE_DATA_HASH:
-      console.log('SETTING TOKEN UPGRADE DATA HASH');
-      newState = _.merge(
-        {},
-        newState,
-        {upgradeData: {[action.tokenId]: {dataHash: action.dataHash}}}
+        {upgradeData: {[action.tokenId]: {upgradeParameters: action.upgradeParameters}}}
       );
       break;
     case TYPES.SET_TOKEN_UPGRADE_SIGNATURE:
@@ -71,8 +63,8 @@ export default function(state, action) {
           }}}
         ],
         function(objValue, srcValue) {
-          if (_.isArray(objValue)) {
-            return objValue.concat(srcValue);
+          if (_.isArray(objValue) && _.isArray(srcValue)) {
+            return _.uniq(_.concat([], objValue, srcValue))
           }
         },
       );

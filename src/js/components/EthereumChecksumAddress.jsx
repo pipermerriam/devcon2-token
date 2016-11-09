@@ -10,7 +10,7 @@ export default connect((state) => state.web3)(React.createClass({
   },
   render() {
     return (
-      <span className="ethereum-address"><code>{this.checksumAddress()}</code></span>
+      <span className="ethereum-checksum-address"><code>{this.checksumAddress()}</code></span>
     );
   }
 }));

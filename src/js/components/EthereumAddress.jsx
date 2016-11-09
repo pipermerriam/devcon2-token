@@ -16,11 +16,10 @@ export default React.createClass({
   },
   render() {
     return (
-      <div className="ethereum-address">
+      <span className="ethereum-address">
         <EthereumAddressIcon address={this.props.address} imageSize={this.props.imageSize} />
         <EthereumChecksumAddress address={this.props.address} />
-        <div className="clearfix"></div>
-      </div>
+      </span>
     );
   }
 });

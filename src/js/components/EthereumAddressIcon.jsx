@@ -22,10 +22,11 @@ export default React.createClass({
       backgroundImage: 'url(' + imgURL + ')',
       width: this.props.imageSize + 'px',
       height: this.props.imageSize + 'px',
+      display: 'inline-block',
     };
 
     return (
-      <div className="ethereum-address-icon" style={style} />
+      <span className="ethereum-address-icon" style={style} />
     );
   }
 });

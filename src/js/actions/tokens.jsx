@@ -40,43 +40,44 @@ export function setTokenData(tokenId, tokenData) {
   }
 }
 
-export function updateTokenUpgradeTarget(tokenId, target) {
+export function updateTokenUpgradeParameters(tokenId, tokenContractAddress, currentOwner, tokenRecipient) {
   return function(dispatch, getState) {
-    dispatch(setTokenUpgradeTarget(tokenId, target))
-    var state = getState()
-    var web3 = state.web3.web3
-    var tokenData = state.tokens.tokenDetails[tokenId]
-    var upgradeTarget = _.get(state.tokens.upgradeData, tokenId + '.target', tokenData.owner)
-    var bytesToSign = _.join([
-      web3.toAscii('0xC59162bbe31b2ECa8E3d7d3401DC05f64E293f83'),
-      web3.toAscii(tokenData.owner),
-      web3.toAscii(upgradeTarget),
-    ], '')
-    computeSha3(state.web3.web3, bytesToSign).then(function(dataHash) {
-      dispatch(setTokenUpgradeDataHash(tokenId, dataHash))
+    var web3 = getState().web3.web3
+
+    var addressesToSign = [tokenContractAddress, currentOwner, tokenRecipient]
+
+    var bytesToSign = ''
+    var hexToSign = ''
+
+    if (_.every(addressesToSign)) {
+      bytesToSign = _.chain(addressesToSign).map(web3.toAscii).join('').value()
+      hexToSign = web3.toHex(bytesToSign)
+    }
+
+    computeSha3(web3, bytesToSign).then(function(dataHash) {
+      dispatch(setTokenUpgradeParameters(tokenId, {
+        tokenContractAddress,
+        currentOwner,
+        tokenRecipient,
+        bytesToSign,
+        hexToSign,
+        dataHash,
+      }))
     }, function(error) {
       console.error(error)
     })
   }
 }
 
-export function setTokenUpgradeTarget(tokenId, target) {
+export function setTokenUpgradeParameters(tokenId, upgradeParameters) {
   return {
-    type: TYPES.SET_TOKEN_UPGRADE_TARGET,
+    type: TYPES.SET_TOKEN_UPGRADE_PARAMETERS,
     tokenId: tokenId,
-    target: target,
+    upgradeParameters: upgradeParameters,
   }
 }
 
-export function setTokenUpgradeDataHash(tokenId, dataHash) {
-  return {
-    type: TYPES.SET_TOKEN_UPGRADE_DATA_HASH,
-    tokenId: tokenId,
-    dataHash: dataHash,
-  }
-}
-
-export function signTokenUpgradeData(tokenId, account, bytesToSign) {
+export function createUpgradeSignature(tokenId, account, bytesToSign) {
   return function(dispatch, getState) {
     var web3 = getState().web3.web3
     signData(web3, account, bytesToSign).then(function(signature) {
@@ -96,10 +97,10 @@ export function setTokenUpgradeSignature(tokenId, signedBytes, signature) {
   }
 }
 
-export function submitTokenUpgradeSignature(tokenId, signature) {
+export function submitProxyUpgrade(tokenId, currentOwner, tokenRecipient, signature) {
   return function(dispatch, getState) {
     var web3 = getState().web3.web3
-    proxyUpgrade(web3, signature).then(function(transactionHash) {
+    proxyUpgrade(web3, currentOwner, tokenRecipient, signature).then(function(transactionHash) {
       dispatch(setTokenUpgradeTransactionHash(tokenId, transactionHash))
     }, function(error) {
       console.error(error)
@@ -107,7 +108,7 @@ export function submitTokenUpgradeSignature(tokenId, signature) {
   }
 }
 
-export function triggerDirectUpgrade(tokenId, account) {
+export function submitDirectUpgrade(tokenId, account) {
   return function(dispatch, getState) {
     var web3 = getState().web3.web3
     directUpgrade(web3, account).then(function(transactionHash) {
