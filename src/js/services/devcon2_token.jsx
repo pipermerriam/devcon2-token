@@ -1,14 +1,31 @@
 import _ from 'lodash'
 import Devcon2TokenAssets from '../../contracts/devcon2_token'
+import { getWeb3 } from './web3'
 
-export function getDevcon2Token(web3) {
-  var devcon2Token = web3.eth.contract(Devcon2TokenAssets.abi).at('0x0a43edfe106d295e7c1e591a4b04b5598af9474c')
-  return Promise.resolve(devcon2Token)
+var contractAddress = null
+
+export function setContractAddress(_contractAddress) {
+  contractAddress = _contractAddress
+  return Promise.resolve(contractAddress)
 }
 
-export function getTokenMeta(web3) {
+export function getDevcon2Token() {
   return new Promise(function(resolve, reject) {
-    getDevcon2Token(web3).then(function(devcon2Token) {
+    if (contractAddress === null) {
+      reject("IndividualityTokenRoot contract address is 'null'")
+    } else {
+      getWeb3().then(function(web3) {
+        resolve(web3.eth.contract(Devcon2TokenAssets.abi).at(contractAddress))
+      }, function(error) {
+        console.error(error)
+      })
+    }
+  })
+}
+
+export function getTokenMeta() {
+  return new Promise(function(resolve, reject) {
+    getDevcon2Token().then(function(devcon2Token) {
       devcon2Token.totalSupply.call(function(err, result) {
         if (!err) {
           resolve({totalSupply: result})
@@ -20,9 +37,9 @@ export function getTokenMeta(web3) {
   })
 }
 
-export function getTokenOwner(web3, tokenId) {
+export function getTokenOwner(tokenId) {
   return new Promise(function(resolve, reject) {
-    getDevcon2Token(web3).then(function(devcon2Token) {
+    getDevcon2Token().then(function(devcon2Token) {
       devcon2Token.ownerOf.call(tokenId, function(err, result) {
         if (!err) {
           resolve(result)
@@ -34,9 +51,9 @@ export function getTokenOwner(web3, tokenId) {
   })
 }
 
-export function getTokenIdentity(web3, tokenId) {
+export function getTokenIdentity(tokenId) {
   return new Promise(function(resolve, reject) {
-    getDevcon2Token(web3).then(function(devcon2Token) {
+    getDevcon2Token().then(function(devcon2Token) {
       devcon2Token.identityOf.call(tokenId, function(err, result) {
         if (!err) {
           resolve(result)
@@ -48,12 +65,12 @@ export function getTokenIdentity(web3, tokenId) {
   })
 }
 
-export function getTokenData(web3, tokenId) {
+export function getTokenData(tokenId) {
   return new Promise(function(resolve, reject) {
-    getDevcon2Token(web3).then(function(devcon2Token) {
+    getDevcon2Token().then(function(devcon2Token) {
       Promise.all([
-        getTokenOwner(web3, tokenId),
-        getTokenIdentity(web3, tokenId),
+        getTokenOwner(tokenId),
+        getTokenIdentity(tokenId),
       ]).then(_.spread(function(owner, identity) {
         resolve({
           owner,
@@ -66,9 +83,9 @@ export function getTokenData(web3, tokenId) {
   })
 }
 
-export function getIsTokenOwner(web3, address) {
+export function getIsTokenOwner(address) {
   return new Promise(function(resolve, reject) {
-    getDevcon2Token(web3).then(function(devcon2Token) {
+    getDevcon2Token().then(function(devcon2Token) {
       devcon2Token.isTokenOwner.call(address, function(err, result) {
         if (!err) {
           resolve(result)
@@ -80,9 +97,12 @@ export function getIsTokenOwner(web3, address) {
   })
 }
 
-export function getTokenID(web3, address) {
+export function getTokenID(address) {
   return new Promise(function(resolve, reject) {
-    getDevcon2Token(web3).then(function(devcon2Token) {
+    Promise.all([
+      getDevcon2Token(),
+      getWeb3(),
+    ]).then(_.spread(function(devcon2Token, web3) {
       devcon2Token.balanceOf.call(address, function(err, result) {
         if (!err) {
           resolve(web3.fromDecimal(result))
@@ -90,16 +110,16 @@ export function getTokenID(web3, address) {
           reject(err)
         }
       })
-    })
+    }))
   })
 }
 
-export function getAddressData(web3, address) {
+export function getAddressData(address) {
   return new Promise(function(resolve, reject) {
-    getDevcon2Token(web3).then(function(devcon2Token) {
+    getDevcon2Token().then(function(devcon2Token) {
       Promise.all([
-        getIsTokenOwner(web3, address),
-        getTokenID(web3, address),
+        getIsTokenOwner(address),
+        getTokenID(address),
       ]).then(_.spread(function(isTokenOwner, tokenId) {
         resolve({
           isTokenOwner,

@@ -3,22 +3,18 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router'
 import _ from 'lodash'
 import actions from '../actions'
-import Devcon2TokenTable from './Devcon2TokenTable'
-import Paginator from './Paginator'
-import { getWeb3 } from '../services/web3'
-import HideIfNoWeb3 from './HideIfNoWeb3'
+import HideIfNoTokenContract from './HideIfNoTokenContract'
 import EthereumAddress from './EthereumAddress'
 
 function mapStateToExplorerProps(state) {
   return {
+    devcon2TokenAddress: state.config.DEVCON2_TOKEN_CONTRACT_ADDRESS,
     ...state.tokens,
     ...state.web3,
   }
 }
 
-const DEVCON2_TOKEN_ADDRESS = '0x0a43edfe106d295e7c1e591a4b04b5598af9474c'
-
-export default HideIfNoWeb3(connect(mapStateToExplorerProps)(React.createClass({
+export default HideIfNoTokenContract(connect(mapStateToExplorerProps)(React.createClass({
   componentWillMount() {
     if (_.isEmpty(this.props.tokenMeta)) {
       this.props.dispatch(actions.loadTokenMeta());
@@ -32,7 +28,7 @@ export default HideIfNoWeb3(connect(mapStateToExplorerProps)(React.createClass({
             <div className='card-block'>
               <h5 className='card-title'>
                 <p>Devcon2 Proof of Individuality Token</p>
-                <EthereumAddress address='0x0a43edfe106d295e7c1e591a4b04b5598af9474c' 
+                <EthereumAddress address={this.devcon2TokenAddress}
                                  imageSize={32} />
               </h5>
               <p className='card-text'>During Devcon2 in 2016 a total of 231 tokens were issued to conference attendees.</p>

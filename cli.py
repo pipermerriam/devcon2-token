@@ -37,8 +37,9 @@ def wait_for_ipc(ipc_path):
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.option('--ipc-path')
-@click.option('--token-address', default='0x0a43edfe106d295e7c1e591a4b04b5598af9474c')
+@click.option('--ipc-path', default='/Users/piper/Library/Ethereum/testnet/geth.ipc')
+#@click.option('--token-address', default='0x0a43edfe106d295e7c1e591a4b04b5598af9474c')
+@click.option('--token-address', default='0x45deb3443db24211f2d419b3396e0e47bcc8042b')
 @click.pass_context
 def main(ctx, ipc_path, token_address):
     """
@@ -187,6 +188,7 @@ def issue(ctx, owner_address, identity):
     token = parent_ctx.token
     wait = parent_ctx.wait
 
+    import pdb; pdb.set_trace()
     txn_hash = token.transact().mint(owner_address, identity)
     click.echo("Minted new token via txn: {0}".format(txn_hash))
     click.echo("Waiting for txn to be mined ...", nl=False)

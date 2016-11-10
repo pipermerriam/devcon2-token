@@ -2,23 +2,21 @@ import React from 'react'
 import { connect } from 'react-redux'
 import actions from '../actions'
 import Devcon2TokenTable from './Devcon2TokenTable'
-import { getWeb3 } from '../services/web3'
-import HideIfNoWeb3 from './HideIfNoWeb3'
+import HideIfNoTokenContract from './HideIfNoTokenContract'
 
 function mapStateToExplorerProps(state) {
   return {
+    tokenContractAddress: state.config.INDIVIDUALITY_TOKEN_ROOT_CONTRACT_ADDRESS,
     ...state.tokens,
     ...state.web3,
   }
 }
 
-const DEVCON2_TOKEN_ADDRESS = '0x0a43edfe106d295e7c1e591a4b04b5598af9474c'
-
-export default HideIfNoWeb3(connect(mapStateToExplorerProps)(React.createClass({
+export default HideIfNoTokenContract(connect(mapStateToExplorerProps)(React.createClass({
   render() {
     return (
       <div>
-        <Devcon2TokenTable paginatorKey={DEVCON2_TOKEN_ADDRESS}
+        <Devcon2TokenTable paginatorKey={this.tokenContractAddress}
                            items={this.props.tokenIds} />
       </div>
     )

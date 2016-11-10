@@ -5,10 +5,10 @@ import _ from 'lodash'
 import actions from '../actions'
 import TokenID from './TokenID'
 import EthereumAddress from './EthereumAddress'
-import HideIfNoWeb3 from './HideIfNoWeb3'
+import HideIfNoTokenContract from './HideIfNoTokenContract'
 import YesNoWithIcon from './YesNoWithIcon'
 
-export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
+export default HideIfNoTokenContract(connect((state) => state.tokens)(React.createClass({
   componentWillMount() {
     if (_.isEmpty(this.tokenData())) {
       this.props.dispatch(actions.loadTokenData(this.tokenID()))

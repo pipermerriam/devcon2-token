@@ -6,6 +6,8 @@ import { syncHistoryWithStore } from 'react-router-redux'
 import thunk from 'redux-thunk'
 
 import reducer from '../reducers/index'
+import actions from '../actions/index'
+import actionLogger from '../middlewares/logging'
 import App from './app'
 import Devcon2TokenIndex from './Devcon2TokenIndex'
 import Devcon2TokenExplorer from './Devcon2TokenExplorer'
@@ -13,19 +15,22 @@ import Devcon2TokenDetail from './Devcon2TokenDetail'
 import Devcon2TokenUpgrade from './Devcon2TokenUpgrade'
 import AddressDetail from './AddressDetail'
 
-
 function createReduxStore() {
   let store = createStore(
     reducer,
-    applyMiddleware(thunk),
+    applyMiddleware(thunk, actionLogger),
   )
   return store
 }
 
+var store = createReduxStore()
+var history = syncHistoryWithStore(browserHistory, store)
+
 export default React.createClass({
+  componentWillMount() {
+    store.dispatch(actions.updateConfig(_.get(window, 'ENV_CONFIG', {})))
+  },
   render() {
-    var store = createReduxStore()
-    const history = syncHistoryWithStore(browserHistory, store)
     return (
       <Provider store={store}>
         <Router history={history}>

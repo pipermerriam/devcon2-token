@@ -12,6 +12,7 @@ import LoadingSpinner from './LoadingSpinner'
 
 function mapStateToProps(state) {
   return {
+    tokenContractAddress: state.config.INDIVIDUALITY_TOKEN_ROOT_CONTRACT_ADDRESS,
     web3: state.web3,
     tokens: state.tokens,
   }
@@ -24,7 +25,7 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
     }
   },
   setUpgradeParameters(formData) {
-    this.props.dispatch(actions.updateTokenUpgradeParameters(this.props.tokenId, '0xC59162bbe31b2ECa8E3d7d3401DC05f64E293f83', this.props.tokenData.owner, formData.tokenRecipient))
+    this.props.dispatch(actions.updateTokenUpgradeParameters(this.props.tokenId, this.props.tokenContractAddress, this.props.tokenData.owner, formData.tokenRecipient))
   },
   submitUpgradeSignature(event) {
     var upgradeData = this.upgradeData()
@@ -33,7 +34,7 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
   },
   getUpgradeParametersFormInitialValues() {
     return {
-      contractAddress: "0xC59162bbe31b2ECa8E3d7d3401DC05f64E293f83",
+      contractAddress: this.props.tokenContractAddress,
       currentOwner: this.props.tokenData.owner,
       tokenRecipient: this.props.tokenData.owner,
     }

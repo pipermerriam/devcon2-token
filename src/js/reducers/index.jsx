@@ -6,6 +6,8 @@ import tokens from './tokens'
 import addresses from './addresses'
 import pagination from './pagination'
 import web3 from './web3'
+import chain from './chain'
+import config from './config'
 
 
 export default combineReducers({
@@ -13,6 +15,8 @@ export default combineReducers({
   pagination,
   web3,
   addresses,
+  chain,
+  config,
   routing: routerReducer,
   form: formReducer,
 })

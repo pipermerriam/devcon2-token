@@ -4,12 +4,12 @@ import { Link } from 'react-router'
 import _ from 'lodash'
 import actions from '../actions'
 import TokenID from './TokenID'
-import HideIfNoWeb3 from './HideIfNoWeb3'
+import HideIfNoTokenContract from './HideIfNoTokenContract'
 import LoadingSpinner from './LoadingSpinner'
 import DirectTokenUpgradeForm from './DirectTokenUpgradeForm'
 import ProxyTokenUpgradeForm from './ProxyTokenUpgradeForm'
 
-export default HideIfNoWeb3(connect((state) => state.tokens)(React.createClass({
+export default HideIfNoTokenContract(connect((state) => state.tokens)(React.createClass({
   componentWillMount() {
     if (_.isEmpty(this.tokenData())) {
       this.props.dispatch(actions.loadTokenData(this.tokenId()))

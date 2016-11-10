@@ -3,6 +3,7 @@ import Devcon2TokenIDs from '../../fixtures/devcon2_token_ids'
 import _ from 'lodash'
 
 var initialState = {
+  contractCode: null,
   tokenIds: [..._.slice(Devcon2TokenIDs, 15)],  // TODO: remove slice
   tokenDetails: {},
   tokenMeta: null,
@@ -17,8 +18,15 @@ export default function(state, action) {
   var newState = state;
 
   switch (action.type) {
+    case TYPES.SET_TOKEN_CONTRACT_CODE:
+      console.log("Contract CODE:", action)
+      newState = _.merge(
+        {},
+        newState,
+        {contractCode: action.contractCode}
+      )
+      break;
     case TYPES.SET_TOKEN_DATA:
-      console.log('SETTING TOKEN DATA');
       newState = _.merge(
         {},
         newState,
@@ -26,7 +34,6 @@ export default function(state, action) {
       )
       break;
     case TYPES.SET_TOKEN_META:
-      console.log('SETTING TOKEN META');
       newState = _.merge(
         {},
         newState,
@@ -34,7 +41,6 @@ export default function(state, action) {
       )
       break;
     case TYPES.SET_TOKEN_UPGRADE_PARAMETERS:
-      console.log('SETTING TOKEN UPGRADE PARAMETERS');
       newState = _.merge(
         {},
         newState,
@@ -42,7 +48,6 @@ export default function(state, action) {
       );
       break;
     case TYPES.SET_TOKEN_UPGRADE_SIGNATURE:
-      console.log('SETTING TOKEN UPGRADE SIGNATURE');
       newState = _.merge(
         {},
         newState,
@@ -53,7 +58,6 @@ export default function(state, action) {
       );
       break;
     case TYPES.SET_TOKEN_UPGRADE_TRANSACTION_HASH:
-      console.log('SETTING TOKEN UPGRADE TRANSACTION HASH');
       newState = _.mergeWith(
         {},
         [

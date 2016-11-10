@@ -4,8 +4,14 @@ import { Link } from 'react-router'
 import _ from 'lodash'
 import actions from '../actions'
 
+function mapStateToProps(state) {
+  return {
+    chainMeta: state.chain.metaData,
+    ...state.web3,
+  }
+}
 
-export default connect(state => state.web3)(React.createClass({
+export default connect(mapStateToProps)(React.createClass({
   componentWillMount() {
     if (this.props.web3Options === null) {
       this.props.dispatch(actions.initializeWeb3())
@@ -13,6 +19,24 @@ export default connect(state => state.web3)(React.createClass({
   },
   updateWeb3(event) {
     this.props.dispatch(actions.selectWeb3(event.target.value))
+  },
+  renderCurrentChain() {
+    if (this.props.web3 === null) {
+      return null
+    }
+    if (this.props.chainMeta.isMainnet) {
+      return (
+        <span className="navbar-text"><strong>Chain:</strong> Mainnet</span>
+      )
+    } else if (this.props.chainMeta.isMorden) {
+      return (
+        <span className="navbar-text"><strong>Chain:</strong> Morden</span>
+      )
+    } else {
+      return (
+        <span className="navbar-text"><strong>Chain:</strong> Unknown</span>
+      )
+    }
   },
   renderWeb3Select() {
     if (this.props.web3Options === null) {
@@ -37,6 +61,7 @@ export default connect(state => state.web3)(React.createClass({
   render() {
     return (
       <nav id='top-nav' className='navbar navbar-dark bg-inverse'>
+        {this.renderCurrentChain()}
         <Link className='navbar-brand' to='/'>Devcon2 Tokens</Link>
         <div className='pull-xs-right'>
           {this.renderWeb3Select()}

@@ -5,7 +5,7 @@ import _ from 'lodash'
 import actions from '../actions'
 import TokenID from './TokenID'
 import EthereumAddress from './EthereumAddress'
-import HideIfNoWeb3 from './HideIfNoWeb3'
+import HideIfNoTokenContract from './HideIfNoTokenContract'
 import YesNoWithIcon from './YesNoWithIcon'
 import LoadingIfUndefined from './LoadingIfUndefined'
 
@@ -18,7 +18,7 @@ function mapStateToProps(state) {
 }
 
 
-export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
+export default HideIfNoTokenContract(connect(mapStateToProps)(React.createClass({
   componentWillMount() {
     if (_.isEmpty(this.addressData())) {
       this.props.dispatch(actions.loadAddressData(this.address()))

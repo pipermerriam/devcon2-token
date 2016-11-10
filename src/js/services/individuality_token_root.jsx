@@ -1,16 +1,36 @@
 import _ from 'lodash'
 import IndividualityTokenRootAssets from '../../contracts/individuality_token_root'
 import { getTokenIdentity } from './devcon2_token'
+import { getWeb3 } from './web3'
 
+var contractAddress = null
 
-export function getIndividualityTokenRoot(web3) {
-  var individualityTokenRoot = web3.eth.contract(IndividualityTokenRootAssets.abi).at('0xC59162bbe31b2ECa8E3d7d3401DC05f64E293f83')
-  return Promise.resolve(individualityTokenRoot)
+export function setContractAddress(_contractAddress) {
+  contractAddress = _contractAddress
+  return Promise.resolve(contractAddress)
 }
 
-export function getTotalSupply(web3) {
+export function getContractAddress() {
+  return Promise.resolve(contractAddress)
+}
+
+export function getIndividualityTokenRoot(web3) {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot(web3).then(function(individualityTokenRoot) {
+    getWeb3().then(function(web3) {
+      if (contractAddress === null) {
+        reject("IndividualityTokenRoot contract address is 'null'")
+      } else {
+        resolve(web3.eth.contract(IndividualityTokenRootAssets.abi).at(contractAddress))
+      }
+    }, function(error) {
+      console.error(error)
+    })
+  })
+}
+
+export function getTotalSupply() {
+  return new Promise(function(resolve, reject) {
+    getIndividualityTokenRoot().then(function(individualityTokenRoot) {
       individualityTokenRoot.totalSupply.call(function(err, result) {
         if (!err) {
           resolve(result)
@@ -22,9 +42,9 @@ export function getTotalSupply(web3) {
   })
 }
 
-export function getUpgradeCount(web3) {
+export function getUpgradeCount() {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot(web3).then(function(individualityTokenRoot) {
+    getIndividualityTokenRoot().then(function(individualityTokenRoot) {
       individualityTokenRoot.upgradeCount.call(function(err, result) {
         if (!err) {
           resolve(result)
@@ -36,11 +56,11 @@ export function getUpgradeCount(web3) {
   })
 }
 
-export function getTokenMeta(web3) {
+export function getTokenMeta() {
   return new Promise(function(resolve, reject) {
     return Promise.all([
-      getTotalSupply(web3),
-      getUpgradeCount(web3),
+      getTotalSupply(),
+      getUpgradeCount(),
     ]).then(_.spread(function(totalSupply, upgradeCount) {
       resolve({
         totalSupply,
@@ -52,9 +72,9 @@ export function getTokenMeta(web3) {
   })
 }
 
-export function getTokenOwner(web3, tokenId) {
+export function getTokenOwner(tokenId) {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot(web3).then(function(individualityTokenRoot) {
+    getIndividualityTokenRoot().then(function(individualityTokenRoot) {
       individualityTokenRoot.ownerOf.call(tokenId, function(err, result) {
         if (!err) {
           resolve(result)
@@ -66,9 +86,9 @@ export function getTokenOwner(web3, tokenId) {
   })
 }
 
-export function getIsTokenUpgraded(web3, tokenId) {
+export function getIsTokenUpgraded(tokenId) {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot(web3).then(function(individualityTokenRoot) {
+    getIndividualityTokenRoot().then(function(individualityTokenRoot) {
       individualityTokenRoot.isTokenUpgraded.call(tokenId, function(err, result) {
         if (!err) {
           resolve(result)
@@ -80,13 +100,13 @@ export function getIsTokenUpgraded(web3, tokenId) {
   })
 }
 
-export function getTokenData(web3, tokenId) {
+export function getTokenData(tokenId) {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot(web3).then(function() {
+    getIndividualityTokenRoot().then(function() {
       Promise.all([
-        getTokenOwner(web3, tokenId),
-        getTokenIdentity(web3, tokenId),
-        getIsTokenUpgraded(web3, tokenId),
+        getTokenOwner(tokenId),
+        getTokenIdentity(tokenId),
+        getIsTokenUpgraded(tokenId),
       ]).then(_.spread(function(owner, identity, isTokenUpgraded) {
         resolve({
           owner,
@@ -100,9 +120,9 @@ export function getTokenData(web3, tokenId) {
   })
 }
 
-export function getIsTokenOwner(web3, address) {
+export function getIsTokenOwner(address) {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot(web3).then(function(individualityTokenRoot) {
+    getIndividualityTokenRoot().then(function(individualityTokenRoot) {
       individualityTokenRoot.isTokenOwner.call(address, function(err, result) {
         if (!err) {
           resolve(result)
@@ -114,9 +134,9 @@ export function getIsTokenOwner(web3, address) {
   })
 }
 
-export function getTokenID(web3, address) {
+export function getTokenID(address) {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot(web3).then(function(individualityTokenRoot) {
+    getIndividualityTokenRoot().then(function(individualityTokenRoot) {
       individualityTokenRoot.tokenId.call(address, function(err, result) {
         if (!err) {
           resolve(result)
@@ -128,11 +148,11 @@ export function getTokenID(web3, address) {
   })
 }
 
-export function getAddressData(web3, address) {
+export function getAddressData(address) {
   return new Promise(function(resolve, reject) {
     Promise.all([
-      getIsTokenOwner(web3, address),
-      getTokenID(web3, address),
+      getIsTokenOwner(address),
+      getTokenID(address),
     ]).then(_.spread(function(isTokenOwner, tokenId) {
       resolve({
         isTokenOwner,
@@ -144,9 +164,9 @@ export function getAddressData(web3, address) {
   })
 }
 
-export function proxyUpgrade(web3, currentOwner, tokenRecipient, signature) {
+export function proxyUpgrade(currentOwner, tokenRecipient, signature) {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot(web3).then(function(individualityTokenRoot) {
+    getIndividualityTokenRoot().then(function(individualityTokenRoot) {
       individualityTokenRoot.proxyUpgrade.call(currentOwner, tokenRecipient, signature, function(err, result) {
         if (!err) {
           resolve(result)
@@ -158,9 +178,9 @@ export function proxyUpgrade(web3, currentOwner, tokenRecipient, signature) {
   })
 }
 
-export function directUpgrade(web3, account) {
+export function directUpgrade(account) {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot(web3).then(function(individualityTokenRoot) {
+    getIndividualityTokenRoot().then(function(individualityTokenRoot) {
       individualityTokenRoot.upgrade.call({from: account}, function(err, result) {
         if (!err) {
           resolve(result)

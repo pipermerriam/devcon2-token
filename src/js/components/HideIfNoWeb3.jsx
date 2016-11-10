@@ -1,21 +1,27 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import actions from '../actions'
 import _ from 'lodash'
 
 
 export default function HideIfNoWeb3(WrappedComponent) {
   return connect(function(state) {
     return {
-      'web3': state.web3.web3,
+      '_web3IsPresent': !_.isEmpty(state.web3.web3),
     }
   })(React.createClass({
+    componentWillMount() {
+      if (!this.props._web3IsPresent) {
+        this.props.dispatch(actions.initializeWeb3())
+      }
+    },
     render() {
-      if (_.isEmpty(this.props.web3)) {
-        return null;
-      } else {
+      if (this.props._web3IsPresent) {
         return (
-          <WrappedComponent {..._.omit(this.props, 'web3')} />
+          <WrappedComponent {..._.omit(this.props, '_web3IsPresent')} />
         )
+      } else {
+        return null;
       }
     }
   }))

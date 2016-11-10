@@ -15,11 +15,6 @@ function mapStateToTokenTableProps(state) {
 }
 
 export default PaginatedComponent(connect(mapStateToTokenTableProps)(React.createClass({
-  getDefaultProps() {
-    return {
-      address: '0x0a43edfe106d295e7c1e591a4b04b5598af9474c',
-    }
-  },
   renderRows() {
     return _.map(this.props.items, _.spread(function(idx, tokenId) {
       return (

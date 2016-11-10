@@ -1,5 +1,7 @@
 import TYPES from './types'
-import { getWeb3Options, getDefaultWeb3, getWeb3, getWeb3Accounts, signData } from '../services/web3'
+import { getWeb3Options, getDefaultWeb3, getSelectedWeb3, getWeb3Accounts, setWeb3, signData } from '../services/web3'
+import { initializeChain } from './chain'
+import { checkContractCode } from './tokens'
 
 export function initializeWeb3() {
   return function(dispatch, getState) {
@@ -17,9 +19,12 @@ export function initializeWeb3() {
 
 export function selectWeb3(choice) {
   return function(dispatch, getState) {
-    getWeb3(choice).then(function(web3) {
+    getSelectedWeb3(choice).then(function(web3) {
+      setWeb3(web3)
       dispatch(setWeb3Selection(choice))
-      dispatch(setWeb3(web3))
+      dispatch(setWeb3Instance(web3))
+      dispatch(initializeChain())
+      dispatch(checkContractCode())
     }, function(error) {
       console.error(error)
     })
@@ -40,7 +45,7 @@ export function setWeb3Selection(selection) {
   }
 }
 
-export function setWeb3(web3) {
+export function setWeb3Instance(web3) {
   return {
     type: TYPES.SET_WEB3,
     web3: web3,

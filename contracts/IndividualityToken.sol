@@ -418,3 +418,7 @@ contract IndividualityTokenRoot is IndividualityTokenRootInterface {
 contract MainnetIndividualityTokenRoot is 
          IndividualityTokenRoot(0x0a43edfe106d295e7c1e591a4b04b5598af9474c) {
 }
+
+contract MordenIndividualityTokenRoot is
+         IndividualityTokenRoot(0x45deb3443db24211f2d419b3396e0e47bcc8042b) {
+}
