@@ -8,3 +8,4 @@ chains/
 .env
 public/
 node_modules
+token-logs

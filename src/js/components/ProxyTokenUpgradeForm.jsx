@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import * as ethUtil from 'ethereumjs-util'
 import React from 'react'
 import { connect } from 'react-redux'
 import SyntaxHighlighter from "react-syntax-highlighter/dist/light"
@@ -77,7 +78,7 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
         <UpgradeParametersForm tokenData={this.props.tokenData} upgradeParameters={this.upgradeParameters()} initialValues={this.getUpgradeParametersFormInitialValues()} onSubmit={this.setUpgradeParameters} />
         <DataToSignCard tokenData={this.props.tokenData} upgradeParameters={this.upgradeParameters()} />
         <SignInBrowserCard tokenData={this.props.tokenData} upgradeParameters={this.upgradeParameters()} />
-        <SignatureForm tokenData={this.props.tokenData} upgradeData={this.upgradeData()} upgradeParameters={this.upgradeParameters()} initialValues={this.getSignatureFormInitialValues()} onSubmit={this.submitUpgradeSignature} />
+        <SignatureForm tokenData={this.props.tokenData} upgradeData={this.upgradeData()} upgradeParameters={this.upgradeParameters()} initialValues={this.getSignatureFormInitialValues()} onSubmit={this.submitUpgradeSignature} validate={signatureValidatorFactory(this.props.web3.web3, this.upgradeParameters())} />
       </div>
     )
   },
@@ -208,6 +209,56 @@ let SignInBrowserCard = connect(function(state) {
   }
 }))
 
+function signatureValidatorFactory(web3, upgradeParameters) {
+  return function(values) {
+    let errors = {}
+
+    if (_.isEmpty(upgradeParameters.dataHash)) {
+      return errors
+    }
+
+    let dataHashBuffer = ethUtil.toBuffer(upgradeParameters.dataHash)
+    let expectedSigner = ethUtil.toBuffer(upgradeParameters.currentOwner)
+
+    if (ethUtil.stripHexPrefix(values.upgradeSignature).length != 65 * 2) {
+      errors.upgradeSignature = "Invalid signature: Must be exactly 65 bytes"
+    } else {
+      let {v, r, s} = ethUtil.fromRpcSig(values.upgradeSignature)
+      let actualSignerPublicKey = ethUtil.ecrecover(dataHashBuffer, v, r, s)
+      let actualSigner = ethUtil.pubToAddress(actualSignerPublicKey)
+
+      if (actualSigner.toString() !== expectedSigner.toString()) {
+        errors.upgradeSignature = `Invalid signature: Expected signature from '${ethUtil.bufferToHex(expectedSigner)}'.  Signature actually signed by '${ethUtil.bufferToHex(actualSigner)}'`
+      }
+    }
+    return errors
+  }
+}
+
+
+let InputWithErrors = React.createClass({
+  render() {
+    let extraClass = ""
+    if (this.props.meta.touched) {
+      if (this.props.meta.error) {
+        extraClass = " has-error"
+      } else {
+        extraClass = " has-success"
+      }
+    }
+    return (
+      <div className={`form-group row${extraClass}`}>
+        <label htmlFor={this.props.name} className="col-sm-2 col-form-label form-control-label">{this.props.label}</label>
+        <div className="col-sm-10">
+          <input type="text" className={`form-control${extraClass}`} name={this.props.name} {...this.props.input} />
+          <div className={`form-control-feedback${extraClass}`}>{this.props.meta.error}</div>
+          <p className="form-text text-muted">The 65 byte signature.</p>
+        </div>
+      </div>
+    )
+  }
+})
+
 let SignatureForm = reduxForm({
   form: 'submit-proxy-upgrade-signature',
 })(connect(function(state) {
@@ -218,12 +269,6 @@ let SignatureForm = reduxForm({
 })(React.createClass({
   isReadyForSignature() {
     return !_.isEmpty(_.get(this.props.upgradeParameters, 'bytesToSign'))
-  },
-  isSignatureValid() {
-    var signedBytes = _.get(this.props.upgradeData, 'signedBytes', '')
-    var bytesToSign = _.get(this.props.upgradeParameters, 'bytesToSign')
-
-    return (!_.isEmpty(this.props.upgradeSignature) && !_.isEmpty(bytesToSign) && bytesToSign === signedBytes)
   },
   render() {
     if (!this.isReadyForSignature()) {
@@ -238,17 +283,9 @@ let SignatureForm = reduxForm({
           <div className="card-block">
             <form className="container" onSubmit={this.props.handleSubmit}>
               <p>Please paste the signature into the field below.</p>
-              <div className="form-group">
-              </div>
-              <div className="form-group row">
-                <label htmlFor="upgradeSignature" className="col-sm-2 col-form-label">Signature</label>
-                <div className="col-sm-10">
-                  <Field type="text" component="input" className="form-control" name="upgradeSignature" />
-                  <p className="form-text text-muted">The 65 byte signature.</p>
-                </div>
-              </div>
+              <Field type="text" component={InputWithErrors} name="upgradeSignature" label="Signature" />
               <div className="btn-group">
-                <button type="submit" disabled={!this.isSignatureValid()} className="btn btn-primary">Submit Upgrade Transaction</button>
+                <button type="submit" disabled={this.props.pristine || this.props.invalid} className="btn btn-primary">Submit Upgrade Transaction</button>
               </div>
             </form>
           </div>

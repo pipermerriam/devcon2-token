@@ -85,6 +85,7 @@ export function getSelectedWeb3(choice) {
       } else if (choice === BROWSER) {
         return getBrowserWeb3().then(resolve, reject);
       } else if (choice === LOCALHOST) {
+        // TODO: how can this get passed through....
         return getCustomWeb3('http://localhost:8545').then(resolve, reject);
       } else {
         reject(`Unknown choice '${choice}'.  Allowed options are ${_.join(allowChoiceValues, ' ')}`);
@@ -100,7 +101,7 @@ function isBrowserAvailable() {
         if (!err) {
           resolve(result)
         } else {
-          reject(err)
+          resolve(false)
         }
       });
     }, function(error) {
@@ -117,7 +118,7 @@ function isInfuraMainnetAvailable() {
         if (!err) {
           resolve(result)
         } else {
-          reject(err)
+          resolve(false)
         }
       });
     });
@@ -127,6 +128,20 @@ function isInfuraMainnetAvailable() {
 function isInfuraMordenAvailable() {
   return new Promise(function(resolve, reject) {
     getInfuraMordenWeb3().then(function(web3) {
+      web3.net.getListening(function(err, result) {
+        if (!err) {
+          resolve(result)
+        } else {
+          resolve(false)
+        }
+      });
+    });
+  });
+}
+
+function isLocalhostAvailable() {
+  return new Promise(function(resolve, reject) {
+    getCustomWeb3('http://localhost:8545').then(function(web3) {
       web3.net.getListening(function(err, result) {
         if (!err) {
           resolve(result)
@@ -141,11 +156,14 @@ function isInfuraMordenAvailable() {
 export function getDefaultWeb3() {
   return new Promise(function(resolve, reject) {
     Promise.all([
+      isLocalhostAvailable(),
       isBrowserAvailable(),
       isInfuraMainnetAvailable(),
       isInfuraMordenAvailable(),
-    ]).then(_.spread(function(browserAvailable, infuraMainnetAvailable, infuraMordenAvailable) {
-      if (browserAvailable === true) {
+    ]).then(_.spread(function(localhostAvailable, browserAvailable, infuraMainnetAvailable, infuraMordenAvailable) {
+      if (localhostAvailable === true) {
+        resolve(LOCALHOST);
+      } else if (browserAvailable === true) {
         resolve(BROWSER);
       } else if (infuraMainnetAvailable === true) {
         resolve(INFURA_MAINNET);
@@ -207,6 +225,30 @@ export function getCode(address, web3 = _web3) {
     web3.eth.getCode(address, function(err, code) {
       if (!err) {
         resolve(code)
+      } else {
+        reject(err)
+      }
+    })
+  })
+}
+
+export function getTransaction(transactionHash, web3 = _web3) {
+  return new Promise(function(resolve, reject) {
+    web3.eth.getTransaction(transactionHash, function(err, transaction) {
+      if (!err) {
+        resolve(transaction)
+      } else {
+        reject(err)
+      }
+    })
+  })
+}
+
+export function getTransactionReceipt(transactionHash, web3 = _web3) {
+  return new Promise(function(resolve, reject) {
+    web3.eth.getTransactionReceipt(transactionHash, function(err, receipt) {
+      if (!err) {
+        resolve(receipt)
       } else {
         reject(err)
       }

@@ -134,3 +134,11 @@ export function submitDirectUpgrade(tokenId, account) {
     })
   }
 }
+
+export function setTokenUpgradeTransactionHash(tokenId, transactionHash) {
+  return {
+    type: TYPES.SET_TOKEN_UPGRADE_TRANSACTION_HASH,
+    tokenId: tokenId,
+    transactionHash: transactionHash,
+  }
+}

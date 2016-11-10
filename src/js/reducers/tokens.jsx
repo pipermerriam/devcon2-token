@@ -19,7 +19,6 @@ export default function(state, action) {
 
   switch (action.type) {
     case TYPES.SET_TOKEN_CONTRACT_CODE:
-      console.log("Contract CODE:", action)
       newState = _.merge(
         {},
         newState,
