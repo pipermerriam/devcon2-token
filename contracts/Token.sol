@@ -14,7 +14,7 @@ contract Devcon2Token is TokenInterface {
      *  +----------------+
      */
     mapping (address => bool) public minters;
-    uint constant _END_MINTING = 1485502400;  // UTC (2016/09/22 - 00:00:00)
+    uint constant _END_MINTING = 1474502400;  // UTC (2016/09/22 - 00:00:00)
 
     function END_MINTING() constant returns (uint) {
         return _END_MINTING;
