@@ -8,6 +8,7 @@ import pagination from './pagination'
 import web3 from './web3'
 import chain from './chain'
 import config from './config'
+import transactions from './transactions'
 
 
 export default combineReducers({
@@ -17,6 +18,7 @@ export default combineReducers({
   addresses,
   chain,
   config,
+  transactions,
   routing: routerReducer,
   form: formReducer,
 })

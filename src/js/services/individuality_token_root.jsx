@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import IndividualityTokenRootAssets from '../../contracts/individuality_token_root'
 import { getTokenIdentity } from './devcon2_token'
-import { getWeb3 } from './web3'
+import { getWeb3, getCoinbase } from './web3'
 
 var contractAddress = null
 
@@ -72,10 +72,10 @@ export function getTokenMeta() {
   })
 }
 
-export function getTokenOwner(tokenId) {
+export function getTokenOwner(tokenIdBytes) {
   return new Promise(function(resolve, reject) {
     getIndividualityTokenRoot().then(function(individualityTokenRoot) {
-      individualityTokenRoot.ownerOf.call(tokenId, function(err, result) {
+      individualityTokenRoot.ownerOf.call(tokenIdBytes, function(err, result) {
         if (!err) {
           resolve(result)
         } else {
@@ -86,10 +86,10 @@ export function getTokenOwner(tokenId) {
   })
 }
 
-export function getIsTokenUpgraded(tokenId) {
+export function getIsTokenUpgraded(tokenIdBytes) {
   return new Promise(function(resolve, reject) {
     getIndividualityTokenRoot().then(function(individualityTokenRoot) {
-      individualityTokenRoot.isTokenUpgraded.call(tokenId, function(err, result) {
+      individualityTokenRoot.isTokenUpgraded.call(tokenIdBytes, function(err, result) {
         if (!err) {
           resolve(result)
         } else {
@@ -100,13 +100,13 @@ export function getIsTokenUpgraded(tokenId) {
   })
 }
 
-export function getTokenData(tokenId) {
+export function getTokenData(tokenIdBytes) {
   return new Promise(function(resolve, reject) {
     getIndividualityTokenRoot().then(function() {
       Promise.all([
-        getTokenOwner(tokenId),
-        getTokenIdentity(tokenId),
-        getIsTokenUpgraded(tokenId),
+        getTokenOwner(tokenIdBytes),
+        getTokenIdentity(tokenIdBytes),
+        getIsTokenUpgraded(tokenIdBytes),
       ]).then(_.spread(function(owner, identity, isTokenUpgraded) {
         resolve({
           owner,
@@ -134,17 +134,20 @@ export function getIsTokenOwner(address) {
   })
 }
 
-export function getTokenID(address) {
+export function getTokenId(address) {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot().then(function(individualityTokenRoot) {
+    Promise.all([
+      getIndividualityTokenRoot(),
+      getWeb3(),
+    ]).then(_.spread(function(individualityTokenRoot, web3) {
       individualityTokenRoot.tokenId.call(address, function(err, result) {
         if (!err) {
-          resolve(result)
+          resolve(web3.toHex(result))
         } else {
           reject(err)
         }
       })
-    })
+    }))
   })
 }
 
@@ -152,7 +155,7 @@ export function getAddressData(address) {
   return new Promise(function(resolve, reject) {
     Promise.all([
       getIsTokenOwner(address),
-      getTokenID(address),
+      getTokenId(address),
     ]).then(_.spread(function(isTokenOwner, tokenId) {
       resolve({
         isTokenOwner,
@@ -164,16 +167,25 @@ export function getAddressData(address) {
   })
 }
 
+const UPGRADE_GAS = 200000
+
 export function proxyUpgrade(currentOwner, tokenRecipient, signature) {
   return new Promise(function(resolve, reject) {
-    getIndividualityTokenRoot().then(function(individualityTokenRoot) {
-      individualityTokenRoot.proxyUpgrade.call(currentOwner, tokenRecipient, signature, function(err, result) {
+    Promise.all([
+      getIndividualityTokenRoot(),
+      getCoinbase(),
+      getWeb3(),
+    ]).then(_.spread(function(individualityTokenRoot, coinbase, web3) {
+      let signatureBytes = web3.toAscii(signature)
+      individualityTokenRoot.proxyUpgrade.sendTransaction(currentOwner, tokenRecipient, signatureBytes, {from: coinbase, gas: UPGRADE_GAS}, function(err, result) {
         if (!err) {
           resolve(result)
         } else {
           reject(err)
         }
       })
+    }), function(error) {
+      reject(error)
     })
   })
 }
@@ -181,7 +193,7 @@ export function proxyUpgrade(currentOwner, tokenRecipient, signature) {
 export function directUpgrade(account) {
   return new Promise(function(resolve, reject) {
     getIndividualityTokenRoot().then(function(individualityTokenRoot) {
-      individualityTokenRoot.upgrade.call({from: account}, function(err, result) {
+      individualityTokenRoot.upgrade.sendTransaction({from: account, gas: UPGRADE_GAS}, function(err, result) {
         if (!err) {
           resolve(result)
         } else {

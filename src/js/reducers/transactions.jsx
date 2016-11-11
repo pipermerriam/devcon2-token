@@ -13,18 +13,7 @@ export default function(state, action) {
   var newState = state;
 
   switch (action.type) {
-    case TYPES.ADD_TRANSACTION:
-      newState = _.assign(
-        {},
-        newState,
-        {transactionDetails: _.assign(
-          {},
-          newState.transactionDetails,
-          {[actions.transactionHash]: action.transactionDetails},
-        )}
-      )
-      break;
-    case TYPES.UPDATE_TRANSACTION:
+    case TYPES.SET_TRANSACTION:
       newState = _.merge(
         {},
         newState,

@@ -6,7 +6,7 @@ import { loadTokenData } from './tokens'
 export function loadAddressData(address) {
   return function(dispatch, getState) {
     var state = getState()
-    getAddressData(state.web3.web3, address).then(function(addressData) {
+    getAddressData(address).then(function(addressData) {
       if (addressData.isTokenOwner && _.isEmpty(state.tokens.tokenDetails[addressData.tokenId])) {
         dispatch(loadTokenData(addressData.tokenId))
       }

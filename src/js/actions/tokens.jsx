@@ -43,7 +43,9 @@ export function setTokenMeta(tokenMeta) {
 
 export function loadTokenData(tokenId) {
   return function(dispatch, getState) {
-    getTokenData(tokenId).then(function(result) {
+    let web3 = getState().web3.web3
+    let tokenIdBytes = web3.toAscii(tokenId)
+    getTokenData(tokenIdBytes).then(function(result) {
       dispatch(setTokenData(tokenId, result))
     }, function(error) {
       console.error(error)
@@ -73,7 +75,7 @@ export function updateTokenUpgradeParameters(tokenId, tokenContractAddress, curr
       hexToSign = web3.toHex(bytesToSign)
     }
 
-    computeSha3(bytesToSign).then(function(dataHash) {
+    computeSha3(hexToSign).then(function(dataHash) {
       dispatch(setTokenUpgradeParameters(tokenId, {
         tokenContractAddress,
         currentOwner,
@@ -115,8 +117,9 @@ export function setTokenUpgradeSignature(tokenId, signedBytes, signature) {
   }
 }
 
-export function submitProxyUpgrade(tokenId, currentOwner, tokenRecipient, signature) {
+export function submitProxyUpgrade(tokenId, signedBytes, currentOwner, tokenRecipient, signature) {
   return function(dispatch, getState) {
+    dispatch(setTokenUpgradeSignature(tokenId, signedBytes, signature))
     proxyUpgrade(currentOwner, tokenRecipient, signature).then(function(transactionHash) {
       dispatch(setTokenUpgradeTransactionHash(tokenId, transactionHash))
     }, function(error) {

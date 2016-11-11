@@ -9,7 +9,7 @@ import TYPES from '../actions/types'
 // morden
 var initialState = {
   DEVCON2_TOKEN_CONTRACT_ADDRESS: '0x45deb3443db24211f2d419b3396e0e47bcc8042b',
-  INDIVIDUALITY_TOKEN_ROOT_CONTRACT_ADDRESS: '0x1cd7a85b8b12d7b5c459d29cd4ccb164d5eb3b08',
+  INDIVIDUALITY_TOKEN_ROOT_CONTRACT_ADDRESS: '0xe4c0e36dea1c062ebd00be3c63cd57449d193f86',
 };
 
 export default function(state, action) {

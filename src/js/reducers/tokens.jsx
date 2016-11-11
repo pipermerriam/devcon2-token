@@ -59,12 +59,10 @@ export default function(state, action) {
     case TYPES.SET_TOKEN_UPGRADE_TRANSACTION_HASH:
       newState = _.mergeWith(
         {},
-        [
-          newState,
-          {upgradeData: {[action.tokenId]: {
-            transactionHashes: [action.transactionHash],
-          }}}
-        ],
+        newState,
+        {upgradeData: {[action.tokenId]: {
+          transactionHashes: [action.transactionHash],
+        }}},
         function(objValue, srcValue) {
           if (_.isArray(objValue) && _.isArray(srcValue)) {
             return _.uniq(_.concat([], objValue, srcValue))

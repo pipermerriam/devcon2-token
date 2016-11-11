@@ -146,7 +146,7 @@ function isLocalhostAvailable() {
         if (!err) {
           resolve(result)
         } else {
-          reject(err)
+          resolve(false)
         }
       });
     });
@@ -188,8 +188,8 @@ export function getWeb3Accounts(web3 = _web3) {
   })
 }
 
-export function computeSha3(bytesToSign, web3 = _web3) {
-  return Promise.resolve(web3.sha3(bytesToSign))
+export function computeSha3(hexToSign, web3 = _web3) {
+  return Promise.resolve(web3.sha3(hexToSign, {encoding: 'hex'}))
 }
 
 export function signData(account, bytesToSign, web3 = _web3) {
@@ -249,6 +249,18 @@ export function getTransactionReceipt(transactionHash, web3 = _web3) {
     web3.eth.getTransactionReceipt(transactionHash, function(err, receipt) {
       if (!err) {
         resolve(receipt)
+      } else {
+        reject(err)
+      }
+    })
+  })
+}
+
+export function getCoinbase(web3 = _web3) {
+  return new Promise(function(resolve, reject) {
+    web3.eth.getCoinbase(function(err, coinbase) {
+      if (!err) {
+        resolve(coinbase)
       } else {
         reject(err)
       }

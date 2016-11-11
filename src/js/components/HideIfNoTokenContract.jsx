@@ -13,13 +13,10 @@ export default function HideIfNoTokenContract(WrappedComponent) {
   })(React.createClass({
     render() {
       if (this.props._tokenContractCode === null) {
-        console.log('HIDEING because code is null')
         return <LoadingSpinner />
       } else if (this.props._tokenContractCode === '0x') {
-        console.log('HIDEING because code is 0x')
         return <p>Token contract does not appear to be present on this chain</p>
       } else {
-        console.log('SHOWING because code is here')
         return (
           <WrappedComponent {..._.omit(this.props, '_tokenContractCode')} />
         )
