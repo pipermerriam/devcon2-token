@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import actions from '../actions'
 import HideIfNoWeb3 from './HideIfNoWeb3'
+import LoadingIfUndefined from './LoadingIfUndefined'
 import Tag from './BSTag'
 
 function mapStateToTransactionListProps(state) {
@@ -35,6 +36,7 @@ export default HideIfNoWeb3(connect(mapStateToTransactionListProps)(React.create
           <tr>
             <th>#</th>
             <th>Transaction Hash</th>
+            <th>Block</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -46,11 +48,31 @@ export default HideIfNoWeb3(connect(mapStateToTransactionListProps)(React.create
   },
 })))
 
-let TransactionRow = React.createClass({
-  transactionStatus() {
-    let statusType = 'success'
+function mapStateToTransactionRow(state) {
+  return {}
+}
+
+let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
+  componentWillMount() {
+  },
+  componentWillUnmount() {
+  },
+  transaction() {
+    return _.get(this.props.transactionData, 'transaction', null)
+  },
+  receipt() {
+    return _.get(this.props.transactionData, 'receipt', null)
+  },
+  isMined() {
+    return !_.isEmpty(_.get(this.transaction(), 'blockHash'))
+  },
+  renderStatus() {
+    let statusType = this.isMined() ? 'success' : 'warning'
+    let statusText = this.isMined() ? 'mined' : 'pending'
     return (
-      <Tag type={statusType}>TODO</Tag>
+      <LoadingIfUndefined targetValue={this.transaction()}>
+        <Tag type={statusType}>{statusText}</Tag>
+      </LoadingIfUndefined>
     )
   },
   render() {
@@ -58,8 +80,9 @@ let TransactionRow = React.createClass({
       <tr>
         <td>{this.props.idx + 1}</td>
         <td>{this.props.transactionHash}</td>
-        <td>{this.transactionStatus()}</td>
+        <td>{this.props.transactionData.}</td>
+        <td>{this.renderStatus()}</td>
       </tr>
     )
   }
-})
+}))

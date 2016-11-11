@@ -10,9 +10,9 @@ export default React.createClass({
       )
     } else {
       return (
-        <div>
+        <span>
           {this.props.children}
-        </div>
+        </span>
       )
     }
   }
