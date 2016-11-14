@@ -267,3 +267,15 @@ export function getCoinbase(web3 = _web3) {
     })
   })
 }
+
+export function sendTransaction(transaction, web3 = _web3) {
+  return new Promise(function(resolve, reject) {
+    web3.eth.sendTransaction(transaction, function(err, transactionHash) {
+      if (!err) {
+        resolve(transactionHash)
+      } else {
+        reject(err)
+      }
+    })
+  })
+}

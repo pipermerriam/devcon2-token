@@ -48,7 +48,7 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
     var signature = ''
 
     if (!_.isEmpty(bytesToSign) && bytesToSign === signedBytes) {
-      signature = _.get(this.upgradeData, 'signature', '')
+      signature = _.get(this.upgradeData(), 'signature', '')
     }
 
     return {
@@ -69,6 +69,54 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
       {},
     )
   },
+  canSignLocally() {
+    var web3 = this.props.web3.web3
+    var address = web3.toChecksumAddress(this.upgradeParameters().currentOwner)
+    return _.some(this.props.web3.accounts, function(account) {
+      return (address === web3.toChecksumAddress(account))
+    })
+  },
+  isReadyForSignature() {
+    return !_.isEmpty(_.get(this.upgradeParameters(), 'bytesToSign'))
+  },
+  renderSignInBrowserForm() {
+    return (
+      <SignInBrowserCard tokenId={this.props.tokenId} tokenData={this.props.tokenData} upgradeParameters={this.upgradeParameters()} />
+    )
+  },
+  renderManualSignatureForm() {
+      return (
+        <SignatureForm tokenId={this.props.tokenId} tokenData={this.props.tokenData} upgradeData={this.upgradeData()} upgradeParameters={this.upgradeParameters()} initialValues={this.getSignatureFormInitialValues()} onSubmit={this.submitUpgradeSignature} validate={signatureValidatorFactory(this.props.web3.web3, this.upgradeParameters())} />
+      )
+  },
+  renderSignatureForms() {
+    if (!this.isReadyForSignature()) {
+      return (
+        <div className="alert alert-info" role="alert">
+          <p>Upgrade Parameters must first be confirmed.</p>
+        </div>
+      )
+    } else if (this.canSignLocally()) {
+      return (
+        <div className="row">
+          <div className="col-sm-6">
+            {this.renderSignInBrowserForm()}
+          </div>
+          <div className="col-sm-6">
+            {this.renderManualSignatureForm()}
+          </div>
+        </div>
+      )
+    } else {
+      return (
+        <div className="row">
+          <div className="col-sm-12">
+            {this.renderManualSignatureForm()}
+          </div>
+        </div>
+      )
+    }
+  },
   render() {
     return (
       <div className="row">
@@ -76,8 +124,17 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
         <div className="col-sm-12">
           <p>This method involves submitting a cryptographic signature to the <code>proxyUpgrade()</code> function.</p>
         </div>
-        <UpgradeParametersForm tokenData={this.props.tokenData} upgradeParameters={this.upgradeParameters()} initialValues={this.getUpgradeParametersFormInitialValues()} onSubmit={this.setUpgradeParameters} />
-        <SignatureForm tokenData={this.props.tokenData} upgradeData={this.upgradeData()} upgradeParameters={this.upgradeParameters()} initialValues={this.getSignatureFormInitialValues()} onSubmit={this.submitUpgradeSignature} validate={signatureValidatorFactory(this.props.web3.web3, this.upgradeParameters())} />
+        <UpgradeParametersForm tokenId={this.props.tokenId} tokenData={this.props.tokenData} upgradeParameters={this.upgradeParameters()} initialValues={this.getUpgradeParametersFormInitialValues()} onSubmit={this.setUpgradeParameters} />
+        <div className="col-sm-12 container">
+          <BSCard>
+            <BSCard.Header>
+              <BSTag>Step 2:</BSTag> Create Upgrade Signature
+            </BSCard.Header>
+            <BSCard.Block>
+              {this.renderSignatureForms()}
+            </BSCard.Block>
+          </BSCard>
+        </div>
       </div>
     )
   },
@@ -136,39 +193,35 @@ let SignInBrowserCard = connect(function(state) {
     web3: state.web3,
   }
 })(React.createClass({
-  canSignLocally() {
-    var web3 = this.props.web3.web3
-    var address = web3.toChecksumAddress(this.props.upgradeParameters.currentOwner)
-    return _.some(this.props.web3.accounts, function(account) {
-      return (address === web3.toChecksumAddress(account))
-    })
-  },
-  signData() {
+  signAndSubmit() {
     this.props.dispatch(actions.createUpgradeSignature(
       this.props.tokenId,
       this.props.upgradeParameters.currentOwner,
       this.props.upgradeParameters.bytesToSign,
     ))
-    this.props.dispatch(resetForm('submit-proxy-upgrade-signature'))
+    let signature = this.props.upgradeData.signature
+    debugger;
+    this.props.dispatch(actions.submitProxyUpgrade(
+      this.props.tokenId,
+      this.props.upgradeParameters.bytesToSign,
+      this.props.upgradeParameters.currentOwner,
+      this.props.upgradeParameters.tokenRecipient,
+      this.props.upgradeData.signature,
+    ))
   },
   render() {
-    if (!this.canSignLocally()) {
-      return null
-    }
     return (
-      <div className="col-sm-12">
-        <BSCard>
-          <BSCard.Header className="card-header">
-            Sign In Browser
-          </BSCard.Header>
-          <BSCard.Block className="card-block">
-            <p>It appears that the address <EthereumAddress address={this.props.upgradeParameters.currentOwner} imageSize={12} /> is available for use within your browser.</p>
-            <div className="btn-group">
-              <button type="button" className="btn btn-primary" onClick={this.signData}>Generate Signature</button>
-            </div>
-          </BSCard.Block>
-        </BSCard>
-      </div>
+      <BSCard>
+        <BSCard.Header className="card-header">
+          Sign In Browser
+        </BSCard.Header>
+        <BSCard.Block className="card-block">
+          <p>It appears that the address <EthereumAddress address={this.props.upgradeParameters.currentOwner} imageSize={12} /> is available for use within your browser.  Click the button below to upgrade your token.</p>
+          <div className="btn-group">
+            <button type="button" className="btn btn-primary" onClick={this.signAndSubmit}>Upgrade Token</button>
+          </div>
+        </BSCard.Block>
+      </BSCard>
     )
   }
 }))
@@ -199,7 +252,6 @@ function signatureValidatorFactory(web3, upgradeParameters) {
   }
 }
 
-
 let InputWithErrors = React.createClass({
   render() {
     let extraClass = ""
@@ -228,7 +280,6 @@ let SignatureForm = reduxForm({
 })(connect(function(state) {
   return {
     web3: state.web3,
-    upgradeSignature: formValueSelector('submit-proxy-upgrade-signature')(state, 'upgradeSignature'),
   }
 })(React.createClass({
   signatureCodeBlock() {
@@ -237,53 +288,39 @@ let SignatureForm = reduxForm({
   gethConsoleCommand() {
     return `> eth.sign("${this.props.upgradeParameters.currentOwner}", "${this.props.upgradeParameters.dataHash}")`
   },
-  isReadyForSignature() {
-    return !_.isEmpty(_.get(this.props.upgradeParameters, 'bytesToSign'))
-  },
   renderBody() {
-    if (this.isReadyForSignature()) {
-      return (
-        <div>
-          <p>The following data needs to be signed by <EthereumAddress address={this.props.upgradeParameters.currentOwner} imageSize={12} />.</p>
-          <SyntaxHighlighter language='javascript' style={docco}>{this.signatureCodeBlock()}</SyntaxHighlighter>
-          <p>This data is the concatenated bytes of the following three values:</p>
-          <ul>
-            <li>Token contract address: <EthereumAddress address={this.props.upgradeParameters.tokenContractAddress} imageSize={12} /></li>
-            <li>Current owner: <EthereumAddress address={this.props.upgradeParameters.currentOwner} imageSize={12} /></li>
-            <li>Owner after upgrade: <EthereumAddress address={this.props.upgradeParameters.tokenRecipient} imageSize={12} /></li>
-          </ul>
-          <p>You can sign the data above with the following command using the <code>geth</code> console:</p>
-          <SyntaxHighlighter language='javascript' style={docco}>{this.gethConsoleCommand()}</SyntaxHighlighter>
-          <SignInBrowserCard tokenData={this.props.tokenData} upgradeParameters={this.props.upgradeParameters} />
-          <form className="container" onSubmit={this.props.handleSubmit}>
-            <p>Please paste the signature into the field below.</p>
-            <Field type="text" component={InputWithErrors} name="upgradeSignature" label="Signature" />
-            <div className="btn-group">
-              <button type="submit" disabled={this.props.pristine || this.props.invalid} className="btn btn-primary">Submit Upgrade Transaction</button>
-            </div>
-          </form>
-        </div>
-      )
-    } else {
-      return (
-        <div className="col-sm-12 alert alert-info" role="alert">
-          <p>Upgrade Parameters must first be confirmed.</p>
-        </div>
-      )
-    }
+    return (
+      <div>
+        <p>The following data needs to be signed by <EthereumAddress address={this.props.upgradeParameters.currentOwner} imageSize={12} />.</p>
+        <SyntaxHighlighter language='javascript' style={docco}>{this.signatureCodeBlock()}</SyntaxHighlighter>
+        <p>This data is the concatenated bytes of the following three values:</p>
+        <ul>
+          <li>Token contract address: <EthereumAddress address={this.props.upgradeParameters.tokenContractAddress} imageSize={12} /></li>
+          <li>Current owner: <EthereumAddress address={this.props.upgradeParameters.currentOwner} imageSize={12} /></li>
+          <li>Owner after upgrade: <EthereumAddress address={this.props.upgradeParameters.tokenRecipient} imageSize={12} /></li>
+        </ul>
+        <p>You can sign the data above with the following command using the <code>geth</code> console:</p>
+        <SyntaxHighlighter language='javascript' style={docco}>{this.gethConsoleCommand()}</SyntaxHighlighter>
+        <form className="container" onSubmit={this.props.handleSubmit}>
+          <p>Please paste the signature into the field below.</p>
+          <Field type="text" component={InputWithErrors} name="upgradeSignature" label="Signature" />
+          <div className="btn-group">
+            <button type="submit" disabled={this.props.pristine || this.props.invalid} className="btn btn-primary">Upgrade Token</button>
+          </div>
+        </form>
+      </div>
+    )
   },
   render() {
     return (
-      <div className="col-sm-12">
-        <BSCard>
-          <BSCard.Header className="card-header">
-            <BSTag>Step 2:</BSTag> Submit Signature
-          </BSCard.Header>
-          <BSCard.Block className="card-block">
-            {this.renderBody()}
-          </BSCard.Block>
-        </BSCard>
-      </div>
+      <BSCard>
+        <BSCard.Header className="card-header">
+          Sign Manually
+        </BSCard.Header>
+        <BSCard.Block className="card-block">
+          {this.renderBody()}
+        </BSCard.Block>
+      </BSCard>
     )
   }
 })));

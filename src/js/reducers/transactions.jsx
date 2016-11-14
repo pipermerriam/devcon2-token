@@ -17,7 +17,7 @@ export default function(state, action) {
       newState = _.merge(
         {},
         newState,
-        {transactionDetails: {[actions.transactionHash]: action.transactionDetails}}
+        {transactionDetails: {[action.transactionHash]: action.transactionDetails}}
       )
       break;
     case TYPES.REMOVE_TRANSACTION:

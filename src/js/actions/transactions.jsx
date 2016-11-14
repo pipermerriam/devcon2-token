@@ -9,7 +9,7 @@ export function getTransactionDetails(transactionHash) {
       getTransaction(transactionHash),
       getTransactionReceipt(transactionHash),
     ]).then(_.spread(function(transaction, receipt) {
-      dispatch(updateTransaction(transactionHash, {
+      dispatch(setTransaction(transactionHash, {
         transaction,
         receipt,
       }))

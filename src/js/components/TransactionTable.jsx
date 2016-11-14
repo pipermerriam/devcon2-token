@@ -36,7 +36,7 @@ export default HideIfNoWeb3(connect(mapStateToTransactionListProps)(React.create
           <tr>
             <th>#</th>
             <th>Transaction Hash</th>
-            <th>Block</th>
+            <th>Block #</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -49,9 +49,7 @@ export default HideIfNoWeb3(connect(mapStateToTransactionListProps)(React.create
 })))
 
 function mapStateToTransactionRow(state) {
-  return {
-    transactions: state.transactions,
-  }
+  return {}
 }
 
 let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
@@ -62,17 +60,21 @@ let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
     this.cancelTimeout()
   },
   refresh() {
+    console.log("transactionData:", this.props.transactionData)
+    console.log("transaction:", this.transaction())
+    console.log("receipt:", this.receipt())
+    console.log("Mined:", this.isMined())
+    console.log("Pending:", this.isPending())
+    console.log("Loading:", this.isLoading())
     if (this.isMined()) {
       this.cancelTimeout()
-    } else if (this.isPending()) {
+    } else if (this.isPending() || this.isLoading()) {
       this.props.dispatch(actions.getTransactionDetails(this.props.transactionHash))
-      this.setTimeout()
-    } else if (this.isLoading()) {
       this.setTimeout()
     }
   },
   cancelTimeout() {
-    let timeoutID = _.get(this.props.transactionData(), 'timeoutID')
+    let timeoutID = _.get(this.props.transactionData, 'timeoutID')
     if (_.isNumber(timeoutID)) {
       window.clearTimeout(timeoutID)
     }
@@ -82,29 +84,26 @@ let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
     }))
   },
   setTimeout() {
-      let timeoutID = window.setTimeout(this.refresh.bind(this), 2000)
+      let timeoutID = window.setTimeout(this.refresh, 2000)
       this.props.dispatch(actions.setTransaction(this.props.transactionHash, {
         isPolling: true,
         timeoutID: timeoutID,
       }))
   },
   isPolling() {
-    return _.get(this.props.transactionData(), 'isPolling', False)
-  },
-  transactionData() {
-    return _.get(this.props.transactions.transactionDetails, this.props.transactionHash)
+    return _.get(this.props.transactionData, 'isPolling', False)
   },
   transaction() {
-    return _.get(this.props.transactionData(), 'transaction')
+    return _.get(this.props.transactionData, 'transaction')
   },
   receipt() {
-    return _.get(this.props.transactionData(), 'receipt')
+    return _.get(this.props.transactionData, 'receipt')
   },
   isLoading() {
     return _.isEmpty(this.transaction())
   },
   isPending() {
-    return !this.isLoading() && _.isEmpty(_.get(this.transaction(), 'blockHash'))
+    return !this.isLoading() && _.isNull(_.get(this.transaction(), 'blockNumber', null))
   },
   isMined() {
     return !this.isLoading() && !this.isPending()
@@ -120,14 +119,14 @@ let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
       throw 'Invariant.  This case should not be possible'
     }
   },
-  getBlockNumber() {
+  getBlockNumberDisplay() {
     let blockNumber = _.get(this.receipt(), 'blockNumber')
-    return blockNumber ? blockNumber : '--'
+    return `# ${blockNumber ? blockNumber : '--'}`
   },
   renderStatus() {
     let statusData = this.getStatusData()
     return (
-      <Tag type={statusData.type}><Icon {...statusData.icon} />{statusData.text}</Tag>
+      <Tag type={statusData.type}> <Icon {...statusData.icon} />{statusData.text}</Tag>
     )
   },
   render() {
@@ -135,7 +134,7 @@ let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
       <tr>
         <td>{this.props.idx + 1}</td>
         <td>{this.props.transactionHash}</td>
-        <td>{this.blockNumber()}</td>
+        <td>{this.getBlockNumberDisplay()}</td>
         <td>{this.renderStatus()}</td>
       </tr>
     )
