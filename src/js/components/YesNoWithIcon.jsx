@@ -1,4 +1,5 @@
 import React from 'react'
+import Icon from './FAIcon'
 
 
 export default React.createClass({
@@ -13,12 +14,12 @@ export default React.createClass({
 
 let NoWithIcon = React.createClass({
   render() {
-    return <i className="fa fa-times"></i>
+    return <span>No <Icon icon="times" /></span>
   }
 });
 
 let YesWithIcon = React.createClass({
   render() {
-    return <i className="fa fa-check"></i>
+    return <span>Yes <Icon icon="check" /></span>
   }
 });

@@ -1,9 +1,10 @@
 import React from 'react'
+import Icon from './FAIcon'
 
 export default React.createClass({
   render() {
     return (
-      <i className="fa fa-spinner fa-spin"></i>
+      <Icon icon="spinner" spin={true} />
     )
   }
 })

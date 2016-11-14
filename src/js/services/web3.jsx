@@ -188,13 +188,13 @@ export function getWeb3Accounts(web3 = _web3) {
   })
 }
 
-export function computeSha3(hexToSign, web3 = _web3) {
-  return Promise.resolve(web3.sha3(hexToSign, {encoding: 'hex'}))
+export function computeSha3(dataAsHex, web3 = _web3) {
+  return Promise.resolve(web3.sha3(dataAsHex, {encoding: 'hex'}))
 }
 
 export function signData(account, bytesToSign, web3 = _web3) {
   return new Promise(function(resolve, reject) {
-    computeSha3(web3, bytesToSign).then(function(hashToSign) {
+    computeSha3(bytesToSign, web3).then(function(hashToSign) {
       web3.eth.sign(account, hashToSign, function(err, signature) {
         if (!err) {
           resolve(signature)

@@ -39,9 +39,11 @@ def wait_for_ipc(ipc_path):
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.option('--ipc-path', default='/Users/piper/Library/Ethereum/testnet/geth.ipc')
 #@click.option('--token-address', default='0x0a43edfe106d295e7c1e591a4b04b5598af9474c')
+#@click.option('--individuality-address', default='TODO')
 @click.option('--token-address', default='0x45deb3443db24211f2d419b3396e0e47bcc8042b')
+@click.option('--individuality-address', default='0xe4c0e36dea1c062ebd00be3c63cd57449d193f86')
 @click.pass_context
-def main(ctx, ipc_path, token_address):
+def main(ctx, ipc_path, token_address, individuality_address):
     """
     Main command
     """
@@ -53,6 +55,12 @@ def main(ctx, ipc_path, token_address):
         code=DEVCON2_TOKEN['code'],
         code_runtime=DEVCON2_TOKEN['code_runtime'],
     )
+    individuality = web3.eth.contract(
+        address=individuality_address,
+        abi=INDIVIDUALITY_ROOT['abi'],
+        code=INDIVIDUALITY_ROOT['code'],
+        code_runtime=INDIVIDUALITY_ROOT['code_runtime'],
+    )
     click.echo("Waiting for ipc connection: {0}".format(web3.currentProvider.ipc_path))
     wait_for_ipc(web3.currentProvider.ipc_path)
     #click.echo("Waiting for account unlock: {0}".format(web3.eth.coinbase))
@@ -61,6 +69,7 @@ def main(ctx, ipc_path, token_address):
     ctx.web3 = web3
     ctx.wait = wait
     ctx.token = token
+    ctx.individuality = individuality
 
 
 def validate_owner_address(ctx, value):
@@ -104,6 +113,7 @@ def repl(ctx):
 
     web3 = parent_ctx.web3
     token = parent_ctx.token
+    individuality = parent_ctx.individuality
     wait = parent_ctx.wait
 
     import pdb; pdb.set_trace()
@@ -635,6 +645,9 @@ DEVCON2_TOKEN = {
     },
     'source': None,
 }
+
+
+INDIVIDUALITY_ROOT = json.loads('{"abi":[{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":true,"name":"_tokenID","type":"bytes32"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":true,"name":"_tokenID","type":"bytes32"}],"name":"Approval","type":"event"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_tokenID","type":"bytes32"}],"name":"isTokenUpgraded","outputs":[{"name":"isUpgraded","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"}],"name":"transferFrom","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"supply","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"}],"name":"transfer","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_owner","type":"address"},{"name":"_newOwner","type":"address"},{"name":"signature","type":"bytes"}],"name":"proxyUpgrade","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"tokenId","outputs":[{"name":"tokenID","type":"bytes32"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_tokenID","type":"bytes32"}],"name":"ownerOf","outputs":[{"name":"owner","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"isTokenOwner","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"upgradeCount","outputs":[{"name":"amount","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"upgrade","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":false,"name":"_tokenID","type":"bytes32"}],"name":"Mint","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"}],"code":"0x","code_runtime":"0x","meta":{"compilerVersion":"Version:0.4.2+commit.af6afb04.Darwin.appleclang\\n","language":"Solidity"},"source":null}')
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import TYPES from './types'
 import { getTokenData, getTokenMeta, proxyUpgrade, directUpgrade, getContractAddress } from '../services/individuality_token_root'
-import { computeSha3, getCode } from '../services/web3'
+import { computeSha3, getCode, signData } from '../services/web3'
 
 export function checkContractCode() {
   return function(dispatch, getState) {

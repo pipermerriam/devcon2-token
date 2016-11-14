@@ -4,7 +4,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import SyntaxHighlighter from "react-syntax-highlighter/dist/light"
 import docco from 'react-syntax-highlighter/dist/styles/docco'; 
-import { Field, reduxForm, formValueSelector } from 'redux-form';
+import { Field, reduxForm, formValueSelector, reset as resetForm } from 'redux-form';
 import actions from '../actions'
 import BSCard from './BSCard'
 import BSTag from './BSTag'
@@ -138,17 +138,18 @@ let SignInBrowserCard = connect(function(state) {
 })(React.createClass({
   canSignLocally() {
     var web3 = this.props.web3.web3
-    var address = web3.toChecksumAddress(this.props.tokenRecipient)
+    var address = web3.toChecksumAddress(this.props.upgradeParameters.currentOwner)
     return _.some(this.props.web3.accounts, function(account) {
       return (address === web3.toChecksumAddress(account))
     })
   },
   signData() {
-    this.props.dispatch(actions.signTokenUpgradeData(
+    this.props.dispatch(actions.createUpgradeSignature(
       this.props.tokenId,
-      this.props.tokenData.owner,
-      this.props.bytesToSign(),
+      this.props.upgradeParameters.currentOwner,
+      this.props.upgradeParameters.bytesToSign,
     ))
+    this.props.dispatch(resetForm('submit-proxy-upgrade-signature'))
   },
   render() {
     if (!this.canSignLocally()) {
@@ -163,7 +164,7 @@ let SignInBrowserCard = connect(function(state) {
           <BSCard.Block className="card-block">
             <p>It appears that the address <EthereumAddress address={this.props.upgradeParameters.currentOwner} imageSize={12} /> is available for use within your browser.</p>
             <div className="btn-group">
-              <button type="button" className="btn btn-primary" onClick={signData}>Generate Signature</button>
+              <button type="button" className="btn btn-primary" onClick={this.signData}>Generate Signature</button>
             </div>
           </BSCard.Block>
         </BSCard>
@@ -253,7 +254,7 @@ let SignatureForm = reduxForm({
           </ul>
           <p>You can sign the data above with the following command using the <code>geth</code> console:</p>
           <SyntaxHighlighter language='javascript' style={docco}>{this.gethConsoleCommand()}</SyntaxHighlighter>
-          <SignInBrowserCard tokenData={this.props.tokenData} upgradeParameters={this.upgradeParameters} />
+          <SignInBrowserCard tokenData={this.props.tokenData} upgradeParameters={this.props.upgradeParameters} />
           <form className="container" onSubmit={this.props.handleSubmit}>
             <p>Please paste the signature into the field below.</p>
             <Field type="text" component={InputWithErrors} name="upgradeSignature" label="Signature" />
