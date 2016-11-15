@@ -9,6 +9,9 @@ import reducer from '../reducers/index'
 import actions from '../actions/index'
 import actionLogger from '../middlewares/logging'
 import App from './app'
+import ConfigureApp from './ConfigureApp'
+import ConfigureIndex from './ConfigureIndex'
+import ConfigureWeb3 from './ConfigureWeb3'
 import Devcon2TokenIndex from './Devcon2TokenIndex'
 import Devcon2TokenExplorer from './Devcon2TokenExplorer'
 import Devcon2TokenDetail from './Devcon2TokenDetail'
@@ -36,6 +39,10 @@ export default React.createClass({
         <Router history={history}>
           <Route path='/' component={App}>
             <IndexRoute component={Devcon2TokenIndex} />
+            <Route path="configure" component={ConfigureApp}>
+              <IndexRoute component={ConfigureIndex} />
+              <Route path="web3" component={ConfigureWeb3} />
+            </Route>
             <Route path="tokens" component={Devcon2TokenExplorer} />
             <Route path="tokens/:id" component={Devcon2TokenDetail} />
             <Route path="tokens/:id/upgrade" component={Devcon2TokenUpgrade} />

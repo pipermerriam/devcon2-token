@@ -36,8 +36,10 @@ export default HideIfNoTokenContract(connect(mapStateToProps)(React.createClass(
     return (
       <div>
         <div className="row">
-          <div className="col-sm-12 alert alert-info" role="alert">
-            <p>Token has already been upgraded.  <Link to={`/tokens/${tokenId}`}>Back to token details...</Link></p>
+          <div className="col-sm-12">
+            <div className="alert alert-info" role="alert">
+              <p>Token has already been upgraded.  <Link to={`/tokens/${tokenId}`}>Back to token details...</Link></p>
+            </div>
           </div>
         </div>
       </div>

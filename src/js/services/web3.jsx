@@ -18,10 +18,10 @@ export function getWeb3() {
   })
 }
 
-const INFURA_MAINNET = 'INFURA (Mainnet)';
-const INFURA_MORDEN = 'INFURA (Morden)';
-const BROWSER = 'BROWSER';
-const LOCALHOST = 'LOCALHOST';
+export const INFURA_MAINNET = 'INFURA (Mainnet)';
+export const INFURA_MORDEN = 'INFURA (Morden)';
+export const BROWSER = 'BROWSER';
+export const CUSTOM = 'CUSTOM';
 
 let getInfuraMainnetWeb3 = _.memoize(function() {
   return new Promise(function(resolve, reject) {
@@ -66,7 +66,7 @@ export function getWeb3Options() {
       ...choices,
       ["Mainnet (infura)", INFURA_MAINNET],
       ["Morden (infura)", INFURA_MORDEN],
-      ["Localhost", LOCALHOST],
+      ["Custom", CUSTOM],
     ];
     resolve(choices);
   });
@@ -84,7 +84,7 @@ export function getSelectedWeb3(choice) {
         return getInfuraMordenWeb3().then(resolve, reject);
       } else if (choice === BROWSER) {
         return getBrowserWeb3().then(resolve, reject);
-      } else if (choice === LOCALHOST) {
+      } else if (choice === CUSTOM) {
         // TODO: how can this get passed through....
         return getCustomWeb3('http://localhost:8545').then(resolve, reject);
       } else {
@@ -162,7 +162,7 @@ export function getDefaultWeb3() {
       isInfuraMordenAvailable(),
     ]).then(_.spread(function(localhostAvailable, browserAvailable, infuraMainnetAvailable, infuraMordenAvailable) {
       if (localhostAvailable === true) {
-        resolve(LOCALHOST);
+        resolve(CUSTOM);
       } else if (browserAvailable === true) {
         resolve(BROWSER);
       } else if (infuraMainnetAvailable === true) {

@@ -1,8 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import '../../css/layout'
-import TopNavigation from './TopNavigation'
 
 function mapStateToProps(state) {
   return {}
@@ -11,8 +9,7 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps)(React.createClass({
   render() {
     return (
-      <div className="container">
-        <TopNavigation />
+      <div>
         {this.props.children}
       </div>
     )
