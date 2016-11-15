@@ -60,12 +60,6 @@ let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
     this.cancelTimeout()
   },
   refresh() {
-    console.log("transactionData:", this.props.transactionData)
-    console.log("transaction:", this.transaction())
-    console.log("receipt:", this.receipt())
-    console.log("Mined:", this.isMined())
-    console.log("Pending:", this.isPending())
-    console.log("Loading:", this.isLoading())
     if (this.isMined()) {
       this.cancelTimeout()
     } else if (this.isPending() || this.isLoading()) {
@@ -84,7 +78,7 @@ let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
     }))
   },
   setTimeout() {
-      let timeoutID = window.setTimeout(this.refresh, 2000)
+      let timeoutID = window.setTimeout(this.refresh, 3000)
       this.props.dispatch(actions.setTransaction(this.props.transactionHash, {
         isPolling: true,
         timeoutID: timeoutID,
@@ -126,7 +120,7 @@ let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
   renderStatus() {
     let statusData = this.getStatusData()
     return (
-      <Tag type={statusData.type}> <Icon {...statusData.icon} />{statusData.text}</Tag>
+      <Tag type={statusData.type}><Icon {...statusData.icon} /> {statusData.text}</Tag>
     )
   },
   render() {

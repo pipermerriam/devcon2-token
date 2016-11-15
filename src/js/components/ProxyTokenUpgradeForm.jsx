@@ -2,6 +2,7 @@ import _ from 'lodash'
 import * as ethUtil from 'ethereumjs-util'
 import React from 'react'
 import { connect } from 'react-redux'
+import { push } from 'react-router-redux';
 import SyntaxHighlighter from "react-syntax-highlighter/dist/light"
 import docco from 'react-syntax-highlighter/dist/styles/docco'; 
 import { Field, reduxForm, formValueSelector, reset as resetForm } from 'redux-form';
@@ -28,11 +29,26 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
     }
   },
   setUpgradeParameters(formData) {
-    this.props.dispatch(actions.updateTokenUpgradeParameters(this.props.tokenId, this.props.tokenContractAddress, this.props.tokenData.owner, formData.tokenRecipient))
+    this.props.dispatch(actions.updateTokenUpgradeParameters(
+      this.props.tokenId,
+      this.props.tokenContractAddress,
+      this.props.tokenData.owner,
+      formData.tokenRecipient,
+    )).then(function() {
+      location.hash = 'signature-form'
+    })
   },
   submitUpgradeSignature(formData) {
-    var upgradeParameters = this.upgradeParameters()
-    this.props.dispatch(actions.submitProxyUpgrade(this.props.tokenId, upgradeParameters.bytesToSign, upgradeParameters.currentOwner, upgradeParameters.tokenRecipient, formData.upgradeSignature))
+    let upgradeParameters = this.upgradeParameters()
+    this.props.dispatch(actions.submitProxyUpgrade(
+      this.props.tokenId,
+      upgradeParameters.bytesToSign,
+      upgradeParameters.currentOwner,
+      upgradeParameters.tokenRecipient,
+      formData.upgradeSignature,
+    )).then(function() {
+      location.hash = 'transaction-list'
+    })
   },
   getUpgradeParametersFormInitialValues() {
     return {
@@ -81,7 +97,7 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
   },
   renderSignInBrowserForm() {
     return (
-      <SignInBrowserCard tokenId={this.props.tokenId} tokenData={this.props.tokenData} upgradeParameters={this.upgradeParameters()} />
+      <SignInBrowserCard tokenId={this.props.tokenId} tokenData={this.props.tokenData} upgradeParameters={this.upgradeParameters()} upgradeData={this.upgradeData()} />
     )
   },
   renderManualSignatureForm() {
@@ -124,11 +140,13 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
         <div className="col-sm-12">
           <p>This method involves submitting a cryptographic signature to the <code>proxyUpgrade()</code> function.</p>
         </div>
+        <a name="upgrade-parameters" />
         <UpgradeParametersForm tokenId={this.props.tokenId} tokenData={this.props.tokenData} upgradeParameters={this.upgradeParameters()} initialValues={this.getUpgradeParametersFormInitialValues()} onSubmit={this.setUpgradeParameters} />
         <div className="col-sm-12 container">
+          <a name="signature-form" />
           <BSCard>
             <BSCard.Header>
-              <BSTag>Step 2:</BSTag> Create Upgrade Signature
+              <BSTag type="info">Step 2:</BSTag> Create Upgrade Signature
             </BSCard.Header>
             <BSCard.Block>
               {this.renderSignatureForms()}
@@ -140,7 +158,6 @@ export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
   },
 })))
 
-
 let UpgradeParametersForm = reduxForm({form: 'proxy-signature-parameters'})(connect(function(state) {
   return {
     tokenRecipient: formValueSelector('proxy-signature-parameters')(state, 'tokenRecipient'),
@@ -151,7 +168,7 @@ let UpgradeParametersForm = reduxForm({form: 'proxy-signature-parameters'})(conn
       <div className="col-sm-12">
         <BSCard>
           <BSCard.Header>
-            <BSTag>Step 1</BSTag>: Upgrade Parameters
+            <BSTag type="info">Step 1</BSTag>: Upgrade Parameters
           </BSCard.Header>
           <BSCard.Block>
             <form className="container clearfix" onSubmit={this.props.handleSubmit}>
@@ -178,7 +195,7 @@ let UpgradeParametersForm = reduxForm({form: 'proxy-signature-parameters'})(conn
               </div>
               <div className="btn-group">
                 <p>The upgraded token will be owned by <EthereumAddress address={this.props.tokenRecipient} imageSize={12} />.  Is this correct?</p>
-                <button type="submit" className="btn btn-primary">Confirm</button>
+                <button type="submit" className="btn btn-primary">Confirm Upgrade Parameters</button>
               </div>
             </form>
           </BSCard.Block>
@@ -198,16 +215,19 @@ let SignInBrowserCard = connect(function(state) {
       this.props.tokenId,
       this.props.upgradeParameters.currentOwner,
       this.props.upgradeParameters.bytesToSign,
-    ))
-    let signature = this.props.upgradeData.signature
-    debugger;
-    this.props.dispatch(actions.submitProxyUpgrade(
-      this.props.tokenId,
-      this.props.upgradeParameters.bytesToSign,
-      this.props.upgradeParameters.currentOwner,
-      this.props.upgradeParameters.tokenRecipient,
-      this.props.upgradeData.signature,
-    ))
+    )).then(function(arst) {
+      console.info('Data', this.props.upgradeData)
+      console.info('Submitting Signature', this.props.upgradeData.signature)
+      this.props.dispatch(actions.submitProxyUpgrade(
+        this.props.tokenId,
+        this.props.upgradeParameters.bytesToSign,
+        this.props.upgradeParameters.currentOwner,
+        this.props.upgradeParameters.tokenRecipient,
+        this.props.upgradeData.signature,
+      )).then(function() {
+        location.hash = 'transaction-list'
+      })
+    }.bind(this))
   },
   render() {
     return (
@@ -291,7 +311,7 @@ let SignatureForm = reduxForm({
   renderBody() {
     return (
       <div>
-        <p>The following data needs to be signed by <EthereumAddress address={this.props.upgradeParameters.currentOwner} imageSize={12} />.</p>
+        <p>The following data needs to be signed by the account <EthereumAddress address={this.props.upgradeParameters.currentOwner} imageSize={12} />.</p>
         <SyntaxHighlighter language='javascript' style={docco}>{this.signatureCodeBlock()}</SyntaxHighlighter>
         <p>This data is the concatenated bytes of the following three values:</p>
         <ul>
@@ -315,7 +335,7 @@ let SignatureForm = reduxForm({
     return (
       <BSCard>
         <BSCard.Header className="card-header">
-          Sign Manually
+          Create Signature
         </BSCard.Header>
         <BSCard.Block className="card-block">
           {this.renderBody()}

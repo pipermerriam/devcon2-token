@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import actions from '../actions'
+import BSCard from './BSCard'
 import LoadingSpinner from './LoadingSpinner'
 import EthereumAddress from './EthereumAddress'
 import EthereumChecksumAddress from './EthereumChecksumAddress'
@@ -12,7 +13,12 @@ export default connect((state) => state.web3)(React.createClass({
     }
   },
   submitDirectUpgrade(event) {
-    this.props.dispatch(actions.submitDirectUpgrade(this.props.tokenId, this.props.tokenData.owner))
+    this.props.dispatch(actions.submitDirectUpgrade(
+      this.props.tokenId,
+      this.props.tokenData.owner,
+    )).then(function() {
+      location.hash = 'transaction-list'
+    })
   },
   isAddressInAccounts() {
     var web3 = this.props.web3
@@ -31,6 +37,7 @@ export default connect((state) => state.web3)(React.createClass({
     } else if (this.isAddressInAccounts()){
       return (
         <div>
+          <p>Upgrade token belonging to <EthereumAddress address={this.props.tokenData.owner} imageSize={10} />.</p>
           <button type="button" className="btn btn-primary" onClick={this.submitDirectUpgrade}>Upgrade Token</button>
         </div>
       )
@@ -48,8 +55,16 @@ export default connect((state) => state.web3)(React.createClass({
     return (
       <div className="row">
         <h2 className="col-sm-12">Method #1: Direct Upgrade</h2>
-        <p>This method involves sending a transaction from <EthereumChecksumAddress address={this.props.tokenData.owner} />.</p>
-        {this.renderBody()}
+        <div className="col-sm-12">
+          <BSCard>
+            <BSCard.Header>
+              Perform Direct Upgrade
+            </BSCard.Header>
+            <BSCard.Block>
+              {this.renderBody()}
+            </BSCard.Block>
+          </BSCard>
+        </div>
       </div>
     )
   },

@@ -1,7 +1,8 @@
+import _ from 'lodash'
 import React from 'react'
 import { connect } from 'react-redux'
 import actions from '../actions'
-import _ from 'lodash'
+import LoadingSpinner from './LoadingSpinner'
 
 
 export default function HideIfNoWeb3(WrappedComponent) {
@@ -21,7 +22,7 @@ export default function HideIfNoWeb3(WrappedComponent) {
           <WrappedComponent {..._.omit(this.props, '_web3IsPresent')} />
         )
       } else {
-        return null;
+        return <LoadingSpinner />
       }
     }
   }))

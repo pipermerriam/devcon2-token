@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router'
 import _ from 'lodash'
 import actions from '../actions'
+import BSBreadcrumb from './BSBreadcrumb'
 import TokenID from './TokenID'
 import EthereumAddress from './EthereumAddress'
 import HideIfNoTokenContract from './HideIfNoTokenContract'
@@ -63,6 +64,15 @@ export default HideIfNoTokenContract(connect((state) => state.tokens)(React.crea
   render() {
     return (
       <div>
+        <div className="row">
+          <div className="col-sm-12">
+            <BSBreadcrumb>
+              <BSBreadcrumb.Crumb linkTo="/" crumbText="Home" />
+              <BSBreadcrumb.Crumb linkTo="/tokens" crumbText="Token List" />
+              <BSBreadcrumb.Crumb crumbText="Token Details" />
+            </BSBreadcrumb>
+          </div>
+        </div>
         <div className="row">
           <h2 className="col-sm-12">Token Details</h2>
         </div>

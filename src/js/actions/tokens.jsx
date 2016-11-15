@@ -75,7 +75,7 @@ export function updateTokenUpgradeParameters(tokenId, tokenContractAddress, curr
       hexToSign = web3.toHex(bytesToSign)
     }
 
-    computeSha3(hexToSign).then(function(dataHash) {
+    return computeSha3(hexToSign).then(function(dataHash) {
       dispatch(setTokenUpgradeParameters(tokenId, {
         tokenContractAddress,
         currentOwner,
@@ -100,7 +100,7 @@ export function setTokenUpgradeParameters(tokenId, upgradeParameters) {
 
 export function createUpgradeSignature(tokenId, account, bytesToSign) {
   return function(dispatch, getState) {
-    signData(account, bytesToSign).then(function(signature) {
+    return signData(account, bytesToSign).then(function(signature) {
       dispatch(setTokenUpgradeSignature(tokenId, bytesToSign, signature))
     }, function(error) {
       console.error(error)
@@ -120,7 +120,7 @@ export function setTokenUpgradeSignature(tokenId, signedBytes, signature) {
 export function submitProxyUpgrade(tokenId, signedBytes, currentOwner, tokenRecipient, signature) {
   return function(dispatch, getState) {
     dispatch(setTokenUpgradeSignature(tokenId, signedBytes, signature))
-    proxyUpgrade(currentOwner, tokenRecipient, signature).then(function(transactionHash) {
+    return proxyUpgrade(currentOwner, tokenRecipient, signature).then(function(transactionHash) {
       dispatch(setTokenUpgradeTransactionHash(tokenId, transactionHash))
     }, function(error) {
       console.error(error)
@@ -130,7 +130,7 @@ export function submitProxyUpgrade(tokenId, signedBytes, currentOwner, tokenReci
 
 export function submitDirectUpgrade(tokenId, account) {
   return function(dispatch, getState) {
-    directUpgrade(account).then(function(transactionHash) {
+    return directUpgrade(account).then(function(transactionHash) {
       dispatch(setTokenUpgradeTransactionHash(tokenId, transactionHash))
     }, function(error) {
       console.error(error)

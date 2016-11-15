@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 import _ from 'lodash'
 import actions from '../actions'
 import BSCard from './BSCard'
+import BSBreadcrumb from './BSBreadcrumb'
 import TokenID from './TokenID'
 import HideIfNoTokenContract from './HideIfNoTokenContract'
 import LoadingSpinner from './LoadingSpinner'
@@ -45,11 +46,43 @@ export default HideIfNoTokenContract(connect(mapStateToProps)(React.createClass(
   renderUpgradeForm(tokenData, upgradeData) {
     return (
       <div>
-        <h1>Upgrading Token: <TokenID tokenId={this.tokenId()} /></h1>
+        <div className="row">
+          <div className="col-sm-12">
+            <BSBreadcrumb>
+              <BSBreadcrumb.Crumb linkTo="/" crumbText="Home" />
+              <BSBreadcrumb.Crumb linkTo="/tokens" crumbText="Token List" />
+              <BSBreadcrumb.Crumb linkTo={`/tokens/${this.tokenId()}`} crumbText="Token Details" />
+              <BSBreadcrumb.Crumb crumbText="Upgrade" />
+            </BSBreadcrumb>
+          </div>
+        </div>
+        <div className="row">
+          <h1 className="col-sm-12">Upgrading Token: <TokenID tokenId={this.tokenId()} length={20} /></h1>
+          <div className="col-sm-12">
+            <p>The original Devcon2 token contract has a few warts related to ERC20 compliance.</p>
+            <ul>
+              <li>Account balances were represented as gigantic numbers</li>
+              <li>Transfering your token to a new owner required transfering that gigantic number of tokens despite the fact that it really only transfers one.</li>
+            </ul>
+            <p>In order to fix these issues a new contract has been deployed which fixes these issues.</p>
+            <ul>
+              <li>Account balances are now always 1 or 0 depending on if the account is a token owner.</li>
+              <li>Transfering your token is now done by just transfering your 1 token.</li>
+            </ul>
+            <p>Upgrading your token can be done in one of <em>two</em> ways</p>
+            <ol>
+              <li><strong>Direct Upgrade:</strong> send a transaction that calls the <code>upgrade()</code> function.  This transaction <strong>must</strong> be sent from the current owner of the token in the old Devcon2 token contract.</li>
+              <li><strong>Proxy Upgrade:</strong> send a transaction which includes a cryptographic signature from the current Devcon2 token owner that calls the <code>proxyUpgrade()</code> function.  This transaction can be sent from any account.</li>
+            </ol>
+          </div>
+        </div>
+        <a name="direct-upgrade" />
         <DirectTokenUpgradeForm tokenId={this.tokenId()} tokenData={tokenData}/>
+        <a name="proxy-upgrade" />
         <ProxyTokenUpgradeForm tokenId={this.tokenId()} tokenData={tokenData}/>
         <div className="row">
           <div className="col-sm-12">
+            <a name="transaction-list" />
             <BSCard>
               <TransactionTable transactions={_.get(upgradeData, 'transactionHashes', [])} />
             </BSCard>

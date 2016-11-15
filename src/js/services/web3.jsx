@@ -194,7 +194,8 @@ export function computeSha3(dataAsHex, web3 = _web3) {
 
 export function signData(account, bytesToSign, web3 = _web3) {
   return new Promise(function(resolve, reject) {
-    computeSha3(bytesToSign, web3).then(function(hashToSign) {
+    let hexToSign = web3.toHex(bytesToSign)
+    computeSha3(hexToSign, web3).then(function(hashToSign) {
       web3.eth.sign(account, hashToSign, function(err, signature) {
         if (!err) {
           resolve(signature)
