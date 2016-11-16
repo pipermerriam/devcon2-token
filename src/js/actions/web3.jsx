@@ -124,14 +124,11 @@ export function setWeb3Instance(web3) {
 
 export function getWeb3AccountList() {
   return function(dispatch, getState) {
-    var p = _.isEmpty(getState().web3.web3) ? dispatch(initializeWeb3()) : Promise.resolve()
-    return p.then(function() {
-      var web3 = getState().web3.web3
-      getWeb3Accounts(web3).then(function(accounts) {
-        dispatch(setWeb3AccountList(accounts))
-      }, function(error) {
-        console.error(error)
-      })
+    getWeb3Accounts().then(function(accounts) {
+      console.log('Accounts', accounts)
+      dispatch(setWeb3AccountList(accounts))
+    }, function(error) {
+      console.error(error)
     })
   }
 }
