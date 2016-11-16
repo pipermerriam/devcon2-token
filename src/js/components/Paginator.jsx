@@ -3,8 +3,14 @@ import { connect } from 'react-redux'
 import _ from 'lodash'
 import actions from '../actions'
 
+function mapStateToProps(state) {
+  return {
+    paginators: state.pagination.paginators,
+  }
+}
+
 export default function PaginatedComponent(WrappedComponent) {
-  return connect((state) => state.pagination)(React.createClass({
+  return connect(mapStateToProps)(React.createClass({
     componentWillMount() {
       if (_.isEmpty(this.paginator())) {
         this.props.dispatch(actions.initializePaginator(this.props.paginatorKey, this.props.items));
@@ -57,7 +63,7 @@ export default function PaginatedComponent(WrappedComponent) {
         }
         return (
           <li className={_.join(classNames, ' ')} key={pageNumber}>
-            <a className='page-link' onClick={() => this.setPageNumber(pageNumber)}>{pageNumber}</a>
+            <a className='page-link' onClick={() => this.setPageNumber(pageNumber)} key={pageNumber}>{pageNumber}</a>
           </li>
         );
       }.bind(this));

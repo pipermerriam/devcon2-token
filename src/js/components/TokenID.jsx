@@ -8,15 +8,15 @@ export default React.createClass({
     }
   },
   render() {
-    if (_.isEmpty(this.props.length)) {
-      return (
-        <code>{this.props.tokenId}</code>
-      )
-    } else {
+    if (_.isNumber(this.props.length)) {
       return (
         <code title={this.props.tokenId}>
           {_.truncate(this.props.tokenId, {length: this.props.length})}
         </code>
+      )
+    } else {
+      return (
+        <code>{this.props.tokenId}</code>
       )
     }
   }

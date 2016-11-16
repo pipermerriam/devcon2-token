@@ -87,13 +87,45 @@ def eth_sign(web3):
     return _inner_sign
 
 
-def test_proxy_upgrade(chain,
-                       web3,
-                       token_v2,
-                       token_v1_owner,
-                       token_id,
-                       get_mint_data,
-                       eth_sign):
+def test_proxy_upgrade_same_owner(chain,
+                                  web3,
+                                  token_v2,
+                                  token_v1_owner,
+                                  token_id,
+                                  get_mint_data,
+                                  eth_sign):
+    assert token_v2.call().balanceOf(token_v1_owner) == 1
+    assert token_v2.call().upgradeCount() == 0
+    assert token_v2.call().isTokenUpgraded(token_id) is False
+
+    signature_data = b''.join((
+        decode_hex(token_v2.address),
+        decode_hex(token_v1_owner),
+        decode_hex(token_v1_owner),
+    ))
+    signature = eth_sign(token_v1_owner, signature_data)
+
+    upgrade_txn_hash = token_v2.transact({
+        'from': web3.eth.coinbase,
+    }).proxyUpgrade(token_v1_owner, token_v1_owner, signature)
+    chain.wait.for_receipt(upgrade_txn_hash)
+
+    mint_data = get_mint_data(upgrade_txn_hash)
+
+    assert token_v2.call().upgradeCount() == 1
+    assert token_v2.call().isTokenUpgraded(token_id) is True
+    assert mint_data['args']['_owner'] == token_v1_owner
+    assert mint_data['args']['_tokenID'] == token_id
+    assert mint_data['address'] == token_v2.address
+
+
+def test_proxy_upgrade_new_owner(chain,
+                                 web3,
+                                 token_v2,
+                                 token_v1_owner,
+                                 token_id,
+                                 get_mint_data,
+                                 eth_sign):
     assert token_v2.call().balanceOf(token_v1_owner) == 1
     assert token_v2.call().upgradeCount() == 0
     assert token_v2.call().isTokenUpgraded(token_id) is False

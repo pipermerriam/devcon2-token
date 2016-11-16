@@ -1,45 +1,29 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
-import _ from 'lodash'
-import actions from '../actions'
+import FAIcon from './FAIcon'
+import Web3StatusIcon from './Web3StatusIcon'
 
+function mapStateToProps(state) {
+  return {}
+}
 
-export default connect(state => state.web3)(React.createClass({
-  componentWillMount() {
-    if (this.props.web3Options === null) {
-      this.props.dispatch(actions.initializeWeb3())
-    }
-  },
-  updateWeb3(event) {
-    this.props.dispatch(actions.selectWeb3(event.target.value))
-  },
-  renderWeb3Select() {
-    if (this.props.web3Options === null) {
-      return null
-    } else {
-      return (
-        <div className='form-inline'>
-          <div className='form-group'>
-            <label htmlFor='web3-connection'>Web3 Connection</label>
-            <select className='form-control' id='web3-connection' defaultValue={this.props.selectedWeb3} onChange={this.updateWeb3}>
-              {_.map(this.props.web3Options, _.spread(function(display, choice) {
-                return (
-                  <option value={choice} key={choice}>{display}</option>
-                )
-              }))}
-            </select>
-          </div>
-        </div>
-      )
-    }
-  },
+export default connect(mapStateToProps)(React.createClass({
   render() {
     return (
       <nav id='top-nav' className='navbar navbar-dark bg-inverse'>
-        <Link className='navbar-brand' to='/'>Devcon2 Tokens</Link>
-        <div className='pull-xs-right'>
-          {this.renderWeb3Select()}
+        <Link className='navbar-brand' to='/'>Devcon2 Token</Link>
+        <div className="pull-xs-right">
+          <ul className="nav navbar-nav">
+            <li className="nav-item">
+              <Link className='nav-link' to='/configure/web3'>
+                <Web3StatusIcon />
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className='nav-link' to='/configure'><FAIcon icon="gear" /> Config</Link>
+            </li>
+          </ul>
         </div>
       </nav>
     )

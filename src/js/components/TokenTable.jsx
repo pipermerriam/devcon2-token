@@ -5,22 +5,13 @@ import actions from '../actions'
 import PaginatedComponent from './Paginator'
 import TokenID from './TokenID'
 import EthereumAddress from './EthereumAddress'
-
+import YesNoWithIcon from './YesNoWithIcon'
 
 function mapStateToTokenTableProps(state) {
-  return {
-    ...state.tokens,
-    ...state.pagination,
-  };
+  return {}
 }
 
-
 export default PaginatedComponent(connect(mapStateToTokenTableProps)(React.createClass({
-  getDefaultProps() {
-    return {
-      address: '0x0a43edfe106d295e7c1e591a4b04b5598af9474c',
-    }
-  },
   renderRows() {
     return _.map(this.props.items, _.spread(function(idx, tokenId) {
       return (
@@ -38,6 +29,7 @@ export default PaginatedComponent(connect(mapStateToTokenTableProps)(React.creat
             <th>#</th>
             <th>TokenID</th>
             <th>Owner</th>
+            <th>Upgraded</th>
           </tr>
         </thead>
         <tbody>
@@ -48,8 +40,13 @@ export default PaginatedComponent(connect(mapStateToTokenTableProps)(React.creat
   }
 })));
 
+function mapStateToTokenRowProps(state) {
+  return {
+    tokenDetails: state.tokens.tokenDetails,
+  }
+}
 
-let TokenTableRow = connect((state) => state.tokens)(React.createClass({
+let TokenTableRow = connect(mapStateToTokenRowProps)(React.createClass({
   componentWillMount() {
     if (_.isEmpty(this.props.tokenDetails[this.props.tokenId]) ) {
       this.props.dispatch(actions.loadTokenData(this.props.tokenId));
@@ -82,6 +79,9 @@ let TokenTableRow = connect((state) => state.tokens)(React.createClass({
             <Link to={`/addresses/${tokenData.owner}`}>
               <EthereumAddress address={tokenData.owner} imageSize={24} />
             </Link>
+          </td>
+          <td>
+            <YesNoWithIcon yesOrNo={tokenData.isTokenUpgraded} />
           </td>
         </tr>
       );

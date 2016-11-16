@@ -379,7 +379,7 @@ contract IndividualityTokenRoot is IndividualityTokenRootInterface {
         } else if (ownerToToken[_newOwner] != 0x0) {
             // new owner already owns a token
             return false;
-        } else if (isEligibleForUpgrade(_newOwner)) {
+        } else if (_owner != _newOwner && isEligibleForUpgrade(_newOwner)) {
             // cannot upgrade to account that is still has an upgradable token
             // on the old system.
             return false;
@@ -400,6 +400,8 @@ contract IndividualityTokenRoot is IndividualityTokenRootInterface {
 
         // Log it
         Mint(_newOwner, tokenID);
+
+        return true;
     }
 
     /// @dev Returns the number of tokens that have been upgraded.
@@ -417,4 +419,8 @@ contract IndividualityTokenRoot is IndividualityTokenRootInterface {
 
 contract MainnetIndividualityTokenRoot is 
          IndividualityTokenRoot(0x0a43edfe106d295e7c1e591a4b04b5598af9474c) {
+}
+
+contract MordenIndividualityTokenRoot is
+         IndividualityTokenRoot(0x45deb3443db24211f2d419b3396e0e47bcc8042b) {
 }
