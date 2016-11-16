@@ -14,6 +14,7 @@ export function loadChainMetaData() {
         isLoaded: true,
         isMainnet: block.hash === MAINNET_BLOCK_0_HASH,
         isMorden: block.hash === MORDEN_BLOCK_0_HASH,
+        genesisBlockHash: block.hash,
       }))
     }, function(error) {
       console.error(error)
@@ -25,6 +26,7 @@ export function resetChainMetaData() {
   return {
     type: TYPES.SET_CHAIN_METADATA,
     metaData: {
+      genesisBlockHash: null,
       isLoaded: false,
       isMainnet: null,
       isMorden: null,

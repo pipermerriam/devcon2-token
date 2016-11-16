@@ -58,4 +58,28 @@ let CardFooter = React.createClass({
 
 Card.Footer = CardFooter
 
+let CardTitle = React.createClass({
+  render() {
+    return (
+      <h5 className='card-title'>
+        {this.props.children}
+      </h5>
+    )
+  }
+})
+
+Card.Title = CardTitle
+
+let CardText = React.createClass({
+  render() {
+    return (
+      <p className='card-text'>
+        {this.props.children}
+      </p>
+    )
+  }
+})
+
+Card.Text = CardText
+
 export default Card

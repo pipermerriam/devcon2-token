@@ -1,7 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import HideIfNoWeb3 from './HideIfNoWeb3'
 
-export default connect((state) => state.web3)(React.createClass({
+function mapStateToProps(state) {
+  return {
+    web3: state.web3.web3,
+  }
+}
+
+export default HideIfNoWeb3(connect(mapStateToProps)(React.createClass({
   propTypes: {
     address: React.PropTypes.string,
   },
@@ -13,4 +20,4 @@ export default connect((state) => state.web3)(React.createClass({
       <span className="ethereum-checksum-address"><code>{this.checksumAddress()}</code></span>
     );
   }
-}));
+})));

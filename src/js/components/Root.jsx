@@ -2,7 +2,7 @@ import React from 'react'
 import { compose, createStore, applyMiddleware } from 'redux'
 import { Router, Route, Link, IndexRoute, browserHistory } from 'react-router'
 import { Provider, connect } from 'react-redux'
-import { syncHistoryWithStore } from 'react-router-redux'
+import { syncHistoryWithStore, routerMiddleware } from 'react-router-redux'
 import thunk from 'redux-thunk'
 import persistState, {mergePersistedState} from 'redux-localstorage';
 import adapter from 'redux-localstorage/lib/adapters/localStorage';
@@ -16,10 +16,10 @@ import App from './app'
 import ConfigureApp from './ConfigureApp'
 import ConfigureIndex from './ConfigureIndex'
 import ConfigureWeb3 from './ConfigureWeb3'
-import Devcon2TokenIndex from './Devcon2TokenIndex'
-import Devcon2TokenExplorer from './Devcon2TokenExplorer'
-import Devcon2TokenDetail from './Devcon2TokenDetail'
-import Devcon2TokenUpgrade from './Devcon2TokenUpgrade'
+import SiteIndex from './SiteIndex'
+import TokenList from './TokenList'
+import TokenDetail from './TokenDetail'
+import TokenUpgrade from './TokenUpgrade'
 import AddressDetail from './AddressDetail'
 
 const reducer = compose(
@@ -35,7 +35,7 @@ const storage = compose(
 )(adapter(window.localStorage));
 
 const enhancer = compose(
-  applyMiddleware(thunk, actionLogger),
+  applyMiddleware(thunk, routerMiddleware(browserHistory, actionLogger)),
   persistState(storage),
 );
 
@@ -60,14 +60,14 @@ export default React.createClass({
       <Provider store={store}>
         <Router history={history}>
           <Route path='/' component={App}>
-            <IndexRoute component={Devcon2TokenIndex} />
+            <IndexRoute component={SiteIndex} />
             <Route path="configure" component={ConfigureApp}>
               <IndexRoute component={ConfigureIndex} />
               <Route path="web3" component={ConfigureWeb3} />
             </Route>
-            <Route path="tokens" component={Devcon2TokenExplorer} />
-            <Route path="tokens/:id" component={Devcon2TokenDetail} />
-            <Route path="tokens/:id/upgrade" component={Devcon2TokenUpgrade} />
+            <Route path="tokens" component={TokenList} />
+            <Route path="tokens/:id" component={TokenDetail} />
+            <Route path="tokens/:id/upgrade" component={TokenUpgrade} />
             <Route path="addresses/:address" component={AddressDetail} />
           </Route>
         </Router>

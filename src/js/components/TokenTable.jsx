@@ -8,10 +8,7 @@ import EthereumAddress from './EthereumAddress'
 import YesNoWithIcon from './YesNoWithIcon'
 
 function mapStateToTokenTableProps(state) {
-  return {
-    ...state.tokens,
-    ...state.pagination,
-  };
+  return {}
 }
 
 export default PaginatedComponent(connect(mapStateToTokenTableProps)(React.createClass({
@@ -43,7 +40,13 @@ export default PaginatedComponent(connect(mapStateToTokenTableProps)(React.creat
   }
 })));
 
-let TokenTableRow = connect((state) => state.tokens)(React.createClass({
+function mapStateToTokenRowProps(state) {
+  return {
+    tokenDetails: state.tokens.tokenDetails,
+  }
+}
+
+let TokenTableRow = connect(mapStateToTokenRowProps)(React.createClass({
   componentWillMount() {
     if (_.isEmpty(this.props.tokenDetails[this.props.tokenId]) ) {
       this.props.dispatch(actions.loadTokenData(this.props.tokenId));
