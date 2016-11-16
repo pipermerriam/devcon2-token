@@ -5,6 +5,7 @@ import _ from 'lodash'
 import actions from '../actions'
 import BSCard from './BSCard'
 import BSBreadcrumb from './BSBreadcrumb'
+import BSAlert from './BSAlert'
 import TokenID from './TokenID'
 import HideIfNoTokenContract from './HideIfNoTokenContract'
 import LoadingSpinner from './LoadingSpinner'
@@ -31,33 +32,54 @@ export default HideIfNoTokenContract(connect(mapStateToProps)(React.createClass(
   upgradeData() {
     return _.get(this.props.upgradeData, this.tokenId(), {})
   },
-  renderAlreadyUpgraded() {
-    const tokenId = this.tokenId()
+  renderBreadcrumbs() {
     return (
-      <div>
-        <div className="row">
-          <div className="col-sm-12">
-            <div className="alert alert-info" role="alert">
-              <p>Token has already been upgraded.  <Link to={`/tokens/${tokenId}`}>Back to token details...</Link></p>
-            </div>
-          </div>
+      <div className="row">
+        <div className="col-sm-12">
+          <BSBreadcrumb>
+            <BSBreadcrumb.Crumb linkTo="/" crumbText="Home" />
+            <BSBreadcrumb.Crumb linkTo="/tokens" crumbText="Token List" />
+            <BSBreadcrumb.Crumb linkTo={`/tokens/${this.tokenId()}`} crumbText="Token Details" />
+            <BSBreadcrumb.Crumb crumbText="Upgrade" />
+          </BSBreadcrumb>
         </div>
       </div>
     )
   },
+  renderAlreadyUpgraded(upgradeData) {
+    const tokenId = this.tokenId()
+    if (_.isEmpty(_.get(upgradeData, 'transactionHashes', []))) {
+      return (
+        <div>
+          {this.renderBreadcrumbs()}
+          <div className="row">
+            <div className="col-sm-12">
+              <BSAlert type="info">
+                <p>Token has already been upgraded.  <Link to={`/tokens/${tokenId}`}>Back to token details...</Link></p>
+              </BSAlert>
+            </div>
+          </div>
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          {this.renderBreadcrumbs()}
+          <div className="row">
+            <div className="col-sm-12">
+              <BSAlert type="success">
+                <p>Token has been upgraded.  <Link to={`/tokens/${tokenId}`}>Back to token details...</Link></p>
+              </BSAlert>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  },
   renderUpgradeForm(tokenData, upgradeData) {
     return (
       <div>
-        <div className="row">
-          <div className="col-sm-12">
-            <BSBreadcrumb>
-              <BSBreadcrumb.Crumb linkTo="/" crumbText="Home" />
-              <BSBreadcrumb.Crumb linkTo="/tokens" crumbText="Token List" />
-              <BSBreadcrumb.Crumb linkTo={`/tokens/${this.tokenId()}`} crumbText="Token Details" />
-              <BSBreadcrumb.Crumb crumbText="Upgrade" />
-            </BSBreadcrumb>
-          </div>
-        </div>
+        {this.renderBreadcrumbs()}
         <div className="row">
           <h1 className="col-sm-12">Upgrading Token: <TokenID tokenId={this.tokenId()} length={20} /></h1>
           <div className="col-sm-12">
@@ -86,7 +108,7 @@ export default HideIfNoTokenContract(connect(mapStateToProps)(React.createClass(
           <div className="col-sm-12">
             <a name="transaction-list" />
             <BSCard>
-              <TransactionTable transactions={_.get(upgradeData, 'transactionHashes', [])} />
+              <TransactionTable tokenId={this.tokenId()} transactions={_.get(upgradeData, 'transactionHashes', [])} />
             </BSCard>
           </div>
         </div>
@@ -97,9 +119,18 @@ export default HideIfNoTokenContract(connect(mapStateToProps)(React.createClass(
     const tokenData = this.tokenData()
     const upgradeData = this.upgradeData()
     if (_.isEmpty(tokenData)) {
-      return <LoadingSpinner />
+      return (
+        <div>
+          {this.renderBreadcrumbs()}
+          <div className="row">
+            <div className="col-sm-12">
+              <LoadingSpinner /> Loading token data...
+            </div>
+          </div>
+        </div>
+      )
     } else if (tokenData.isTokenUpgraded) {
-      return this.renderAlreadyUpgraded()
+      return this.renderAlreadyUpgraded(upgradeData)
     } else {
       return this.renderUpgradeForm(tokenData, upgradeData)
     }

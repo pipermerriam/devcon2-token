@@ -174,7 +174,7 @@ let ConfigureBrowserWeb3 = connect(mapStateToConfigureCustomWeb3Props)(React.cre
     }
   },
   renderButtonText() {
-    if (this.isAvailable()) {
+    if (this.isAvailable() || this.isSelected()) {
       return "Select"
     } else {
       return "No Web3 Found In Browser"

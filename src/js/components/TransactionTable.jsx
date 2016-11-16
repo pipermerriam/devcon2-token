@@ -24,7 +24,7 @@ export default HideIfNoWeb3(connect(mapStateToTransactionListProps)(React.create
       return _.map(this.props.transactions, function(transactionHash, idx) {
         let transactionData = _.get(this.props.transactionDetails, transactionHash, {})
         return (
-          <TransactionRow key={idx} idx={idx} transactionHash={transactionHash} transactionData={transactionData} />
+          <TransactionRow key={idx} idx={idx} tokenId={this.props.tokenId} transactionHash={transactionHash} transactionData={transactionData} />
         )
       }.bind(this))
     }
@@ -60,11 +60,12 @@ let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
     this.cancelTimeout()
   },
   refresh() {
+    this.cancelTimeout()
     if (this.isMined()) {
-      this.cancelTimeout()
+      this.props.dispatch(actions.loadTokenData(this.props.tokenId))
     } else if (this.isPending() || this.isLoading()) {
-      this.props.dispatch(actions.getTransactionDetails(this.props.transactionHash))
       this.setTimeout()
+      this.props.dispatch(actions.getTransactionDetails(this.props.transactionHash))
     }
   },
   cancelTimeout() {
@@ -84,9 +85,6 @@ let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
         timeoutID: timeoutID,
       }))
   },
-  isPolling() {
-    return _.get(this.props.transactionData, 'isPolling', False)
-  },
   transaction() {
     return _.get(this.props.transactionData, 'transaction')
   },
@@ -96,8 +94,11 @@ let TransactionRow = connect(mapStateToTransactionRow)(React.createClass({
   isLoading() {
     return _.isEmpty(this.transaction())
   },
+  isPolling() {
+    return _.get(this.props.transactionData, 'isPolling', false)
+  },
   isPending() {
-    return !this.isLoading() && _.isNull(_.get(this.transaction(), 'blockNumber', null))
+    return !this.isLoading() && _.isNull(_.get(this.receipt(), 'blockNumber', null))
   },
   isMined() {
     return !this.isLoading() && !this.isPending()
