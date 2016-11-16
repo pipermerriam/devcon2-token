@@ -37,19 +37,18 @@ def wait_for_ipc(ipc_path):
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
-#@click.option('--ipc-path', default='/Users/piper/Library/Ethereum/testnet/geth.ipc')
-#@click.option('--token-address', default='0x0a43edfe106d295e7c1e591a4b04b5598af9474c')
-#@click.option('--individuality-address', default='0xdd94de9cfe063577051a5eb7465d08317d8808b6')
-@click.option('--ipc-path', default='/Users/piper/.parity/jsonrpc.ipc')
-@click.option('--token-address', default='0x45deb3443db24211f2d419b3396e0e47bcc8042b')
-@click.option('--individuality-address', default='0x56f94284acac8c94169f569b16bbc540ed10f771')
+@click.option('--ipc-path', default='/Users/piper/Library/Ethereum/testnet/geth.ipc')
+@click.option('--token-address', default='0x0a43edfe106d295e7c1e591a4b04b5598af9474c')
+@click.option('--individuality-address', default='0xdd94de9cfe063577051a5eb7465d08317d8808b6')
+#@click.option('--ipc-path', default='/Users/piper/.parity/jsonrpc.ipc')
+#@click.option('--token-address', default='0x45deb3443db24211f2d419b3396e0e47bcc8042b')
+#@click.option('--individuality-address', default='0x56f94284acac8c94169f569b16bbc540ed10f771')
 @click.pass_context
 def main(ctx, ipc_path, token_address, individuality_address):
     """
     Main command
     """
     web3 = Web3(Web3.IPCProvider(ipc_path=ipc_path))
-    web3.eth.defaultAccount = '0xAFFA9e11A8deaC514b93169c764aA042B4fE316F'
     wait = Wait(web3, timeout=600)
     token = web3.eth.contract(
         address=token_address,

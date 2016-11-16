@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 var initialState = {
   contractCode: null,
-  tokenIds: [..._.slice(Devcon2TokenIDs, 15)],  // TODO: remove slice
+  tokenIds: Devcon2TokenIDs,
   tokenDetails: {},
   tokenMeta: null,
   upgradeData: {},
