@@ -3,6 +3,7 @@ import TYPES from '../actions/types'
 
 var initialState = {
   metaData: {
+    isLoaded: false,
     isMainnet: null,
     isMorden: null,
   },

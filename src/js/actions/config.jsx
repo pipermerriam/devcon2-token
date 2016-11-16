@@ -9,6 +9,7 @@ export function updateConfig(config) {
     var state = getState()
     setIndividualityRootContractAddress(state.config.INDIVIDUALITY_TOKEN_ROOT_CONTRACT_ADDRESS)
     setDevcon2TokenContractAddress(state.config.DEVCON2_TOKEN_CONTRACT_ADDRESS)
+    return Promise.resolve()
   }
 }
 

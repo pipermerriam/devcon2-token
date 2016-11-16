@@ -2085,6 +2085,12 @@ lodash.clonedeep@^4.3.2:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
 
+lodash.debounce@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-3.1.1.tgz#812211c378a94cc29d5aa4e3346cf0bfce3a7df5"
+  dependencies:
+    lodash._getnative "^3.0.0"
+
 lodash.deburr@^3.0.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/lodash.deburr/-/lodash.deburr-3.2.0.tgz#6da8f54334a366a7cf4c4c76ef8d80aa1b365ed5"
@@ -3020,6 +3026,20 @@ redux-form:
     lodash "^4.16.6"
     lodash-es "^4.16.6"
     shallowequal "^0.2.2"
+
+redux-localstorage-debounce:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/redux-localstorage-debounce/-/redux-localstorage-debounce-0.1.0.tgz#ce8f4c9c36a7b867550dca24a7ef4068fb5bc18b"
+  dependencies:
+    lodash.debounce "^3.1.1"
+
+redux-localstorage-filter:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/redux-localstorage-filter/-/redux-localstorage-filter-0.1.1.tgz#94c5ab68d8cda479bb3cc6cdf03569f8f63a188d"
+
+redux-localstorage@rc:
+  version "1.0.0-rc5"
+  resolved "https://registry.yarnpkg.com/redux-localstorage/-/redux-localstorage-1.0.0-rc5.tgz#7067bc4cb0b03b5c791025ac33dde6175d50d5d1"
 
 redux-thunk@^2.1.0:
   version "2.1.0"

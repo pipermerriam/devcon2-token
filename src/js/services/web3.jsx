@@ -23,6 +23,10 @@ export const INFURA_MORDEN = 'INFURA (Morden)';
 export const BROWSER = 'BROWSER';
 export const CUSTOM = 'CUSTOM';
 
+const ALLOWED_CHOICES = [BROWSER, CUSTOM, INFURA_MAINNET, INFURA_MORDEN]
+
+export const DEFAULT_LOCALHOST_RPCHOST = 'http://localhost:8545'
+
 let getInfuraMainnetWeb3 = _.memoize(function() {
   return new Promise(function(resolve, reject) {
     resolve(new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io')));
@@ -53,48 +57,25 @@ function getBrowserWeb3(rpcHost) {
   });
 }
 
-export function getWeb3Options() {
+
+export function getSelectedWeb3(choice, config) {
   return new Promise(function(resolve, reject) {
-    var choices = []
-    if (window !== undefined && window.web3 !== undefined) {
-      var providerName = _.get(web3, 'currentProvider.constructor.name')
-      var isMetamask = _.startsWith(providerName, 'Metamask')
-      var displayName = isMetamask ? 'Metamask' : 'Browser'
-      choices = [...choices, [displayName, BROWSER]];
+    if (choice === INFURA_MAINNET) {
+      return getInfuraMainnetWeb3().then(resolve, reject);
+    } else if (choice === INFURA_MORDEN) {
+      return getInfuraMordenWeb3().then(resolve, reject);
+    } else if (choice === BROWSER) {
+      return getBrowserWeb3().then(resolve, reject);
+    } else if (choice === CUSTOM) {
+      const rpcHost = _.get(config, 'rpcHost', DEFAULT_LOCALHOST_RPCHOST)
+      return getCustomWeb3(rpcHost).then(resolve, reject);
+    } else {
+      reject(`Unknown choice '${choice}'.  Allowed options are ${_.join(ALLOWED_CHOICES, ' ')}`);
     }
-    choices = [
-      ...choices,
-      ["Mainnet (infura)", INFURA_MAINNET],
-      ["Morden (infura)", INFURA_MORDEN],
-      ["Custom", CUSTOM],
-    ];
-    resolve(choices);
   });
 }
 
-export function getSelectedWeb3(choice) {
-  return new Promise(function(resolve, reject) {
-    getWeb3Options().then(function(allowedChoices) {
-      var allowChoiceValues = _.unzip(allowedChoices)[1];
-      if (_.indexOf(allowChoiceValues, choice) < 0) {
-        reject(`Invalid choice '${choice}'.  Allowed options are ${_.join(allowChoiceValues, ' ')}`);
-      } else if (choice === INFURA_MAINNET) {
-        return getInfuraMainnetWeb3().then(resolve, reject);
-      } else if (choice === INFURA_MORDEN) {
-        return getInfuraMordenWeb3().then(resolve, reject);
-      } else if (choice === BROWSER) {
-        return getBrowserWeb3().then(resolve, reject);
-      } else if (choice === CUSTOM) {
-        // TODO: how can this get passed through....
-        return getCustomWeb3('http://localhost:8545').then(resolve, reject);
-      } else {
-        reject(`Unknown choice '${choice}'.  Allowed options are ${_.join(allowChoiceValues, ' ')}`);
-      }
-    });
-  });
-}
-
-function isBrowserAvailable() {
+export function isBrowserAvailable() {
   return new Promise(function(resolve, reject) {
     getBrowserWeb3().then(function(web3) {
       web3.net.getListening(function(err, result) {
@@ -278,5 +259,17 @@ export function sendTransaction(transaction, web3 = _web3) {
         reject(err)
       }
     })
+  })
+}
+
+export function isConnected(web3 = _web3) {
+  return new Promise(function(resolve, reject) {
+    web3.net.getListening(function(err, result) {
+      if (!err) {
+        resolve(result)
+      } else {
+        resolve(false)
+      }
+    });
   })
 }
