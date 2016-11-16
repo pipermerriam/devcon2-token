@@ -30,6 +30,7 @@ export function selectWeb3(choice) {
         dispatch(setWeb3Selection(choice))
         dispatch(setWeb3Instance(web3))
       }).then(function() {
+        dispatch(getWeb3AccountList())
         dispatch(loadChainMetaData())
         dispatch(updateWeb3Status())
         dispatch(checkContractCode())

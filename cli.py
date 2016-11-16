@@ -37,7 +37,7 @@ def wait_for_ipc(ipc_path):
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.option('--ipc-path', default='/Users/piper/Library/Ethereum/testnet/geth.ipc')
+@click.option('--ipc-path', default='/Users/piper/Library/Ethereum/geth.ipc')
 @click.option('--token-address', default='0x0a43edfe106d295e7c1e591a4b04b5598af9474c')
 @click.option('--individuality-address', default='0xdd94de9cfe063577051a5eb7465d08317d8808b6')
 #@click.option('--ipc-path', default='/Users/piper/.parity/jsonrpc.ipc')
