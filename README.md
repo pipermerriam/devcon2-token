@@ -1,4 +1,4 @@
-# Devcon2 Token @ [`0x0a43edfe106d295e7c1e591a4b04b5598af9474c`](https://etherscan.io/address/0x0a43edfe106d295e7c1e591a4b04b5598af9474c)
+# Devcon2 Token @ [`0xdd94De9cFE063577051A5eb7465D08317d8808B6`](https://etherscan.io/address/0xdd94De9cFE063577051A5eb7465D08317d8808B6)
 
 [Token Explorer](http://devcon2-token.com/)
 
@@ -51,24 +51,19 @@ And linked against TokenLib @ [`0xabf65a51c7adc3bdef0adf8992884be38072c184`](htt
 
 # ERC20 Compliance
 
-The contract is ERC20 compliant, but it somewhat abuses the specification.
-Your *balance* is actually the integer representation of the
-`sha3(identity_string)`.  If you want to transfer your token to a different
-address and you are using something that supports the ERC20 standard then the
-`_value` parameter must to your full account balance for the transfer to work.
-
-Each address may only ever be in posession of one token so you cannot send your
-token to an account that already has a token.
+The contract is ERC20 compliant with the additional constraint that each
+address may only ever be in posession of one token.  This means that you
+transferring your token to an account that already has a token will fail.
 
 
 ## Additional Functions
 
 The contract also implements the following functions which mirror their ERC20
-functions except they use a `bytes32` for the value.
+functions except they exclude the value parameters since it is always `1`.
 
-* `function transfer(address _to, bytes32 _value) returns (bool success)`
-* `function transferFrom(address _from, address _to, bytes32 _value) returns (bool success)`
-* `function approve(address _spender, bytes32 _value) returns (bool success)`
+* `function transfer(address _to) returns (bool success)`
+* `function transferFrom(address _from, address _to) returns (bool success)`
+* `function approve(address _spender) returns (bool success)`
 
 
 And the following events which mirror the ERC events.
@@ -82,8 +77,12 @@ the tokens.
 
 
 * `function isTokenOwner(address _owner) constant returns (bool)`
-* `function identityOf(bytes32 _id) constant returns (string identity)`
 * `function ownerOf(bytes32 _id) constant returns (address owner)`
+* `function tokenId(address _owner) constant returns (bytes32 tokenID)`
+* `function upgrade() public returns (bool success)`
+* `function proxyUpgrade(address _owner, address _newOwner, bytes signature) public returns (bool)`
+* `function upgradeCount() constant returns (uint256 _amount)`
+* `function isTokenUpgraded(bytes32 _tokenID) constant returns (bool isUpgraded)`
 
 
 # Examples
