@@ -1,4 +1,4 @@
-# Devcon2 Token @ [`0xdd94De9cFE063577051A5eb7465D08317d8808B6`](https://etherscan.io/address/0xdd94De9cFE063577051A5eb7465D08317d8808B6)
+# Devcon2 Token @ [`0xdd94De9cFE063577051A5eb7465D08317d8808B6`](https://etherscan.io/token/devcon2)
 
 [Token Explorer](http://devcon2-token.com/)
 
